@@ -1,21 +1,12 @@
-import StudentService from "../../application/services/StudentService.js";
+import UseCaseEmmitStudentCredential from "../../application/usesCases/UseCaseEmmitStudentCredential.js";
 
 class StudentController{
     async veryfyStudentInDB(req, res){
-        console.log("verify",req.body);
         try {
             const {SISCode} = req.body;
-            const student = await StudentService.veryfyStudentInDB(SISCode);
-
-            if(student){
-                res.status(200).send({
-                    id: student.id,
-                    codSIS: student.codSIS
-                });
-            }
-            else{
-                res.status(404).send("Estudiante no encontrado");
-            }
+            const student =    
+                await UseCaseEmmitStudentCredential.emmitCredential(SISCode);
+            res.status(200).json(student);
         } catch (error) {
             console.error(error);
             res.status(500).send("Error en el servidor");       

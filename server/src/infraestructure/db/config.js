@@ -4,10 +4,6 @@ import path from 'path';
 console.log("Current working directory:", process.cwd());
 dotenv.config();
 
-console.log(process.env.DB_USER);
-console.log(process.env.DB_PASS);
-console.log(process.env.DB_NAME);
-console.log(process.env.DB_HOST);
 
 export default {
   development: {
