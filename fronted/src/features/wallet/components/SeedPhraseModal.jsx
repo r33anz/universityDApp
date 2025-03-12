@@ -28,16 +28,14 @@ import { Checkbox } from "../../../shared/components/CheckBox";
 import { Button } from "../../../shared/components/Button";
 import React, { useState, useEffect } from "react";
 
-const  SeedPhraseModal = ({ isOpen, onClose }) => {
+const  SeedPhraseModal = ({ isOpen, onClose,seedPhrase }) => {
     const [showSeedPhrase, setShowSeedPhrase] = useState(false)
     const [copied, setCopied] = useState(false)
     const [confirmedChecked, setConfirmedChecked] = useState(false)
     const [showCloseWarning, setShowCloseWarning] = useState(false)
     const [step, setStep] = useState(1)
-  
-    const seedPhrase = "aaaaa bbbbb ccccccccc dddd eeee fff ggg hhh iii jjjj lll kk"
     const seedWords = seedPhrase.split(" ")
-  
+    
     useEffect(() => {
       if (isOpen) {
         setShowSeedPhrase(false)

@@ -3,23 +3,43 @@ import { Button } from "../../../shared/components/Button";
 import {Input} from "../../../shared/components/Input";
 import {Label} from "../../../shared/components/Label";
 import SeedPhraseModal  from "../../wallet/components/SeedPhraseModal";
+import { loginStudent } from "../service/studentService";
+import { useToastContext } from "../../../shared/providers/ToastProvider";
+import { ApiError } from "../../../shared/lib/apiError";
 
 const  StudentLoginForm = () => {
     const [codigoSIS, setCodigoSIS] = useState("")
     const [loading, setLoading] = useState(false)
     const [showSeedPhrase, setShowSeedPhrase] = useState(false)
-  
+    const [seedPhrase, setSeedPhrase] = useState(" ")
+    const toast = useToastContext()
+
     const handleSubmit = async (e) => {
-      e.preventDefault()
-      setLoading(true)
-  
-      // Simulación de envío de credenciales
-      setTimeout(() => {
-        setLoading(false)
-        console.log(`Iniciando sesión como estudiante con código: ${codigoSIS}`)
-        // Mostrar el modal de frase semilla después del login exitoso
-        setShowSeedPhrase(true)
-      }, 1500)
+        try {
+            e.preventDefault()
+            setLoading(true)
+            const credential = {SISCode:codigoSIS};
+            const response = await loginStudent(credential);
+            const seedPhrase = response.mnemonic 
+            setSeedPhrase(seedPhrase)
+            setShowSeedPhrase(true)
+        } catch (error) {
+            if (error.response?.data) {
+                const apiError = new ApiError(
+                    error.response.data.message,
+                    error.response.data.errorCode,
+                    error.response.data.details
+                );
+
+                toast.error(apiError.getStatusErrorMessage())
+            } else if (error instanceof ApiError || error.name === "ApiError") {
+                toast.error(error.getStatusErrorMessage())
+            } else{
+                toast.error("Ocurrió un error inesperado")
+            }
+        } finally {
+            setLoading(false)
+        }
     }
   
     return (
@@ -49,7 +69,11 @@ const  StudentLoginForm = () => {
   
         </form>
   
-        <SeedPhraseModal isOpen={showSeedPhrase} onClose={() => setShowSeedPhrase(false)} />
+        <SeedPhraseModal 
+            isOpen={showSeedPhrase} 
+            onClose={() => setShowSeedPhrase(false)}
+            seedPhrase={seedPhrase}
+            />
       </>
     )
   }

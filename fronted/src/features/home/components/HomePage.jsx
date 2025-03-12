@@ -16,7 +16,7 @@ const  HomePage = () => {
             <h2 className="text-2xl font-semibold text-[#184494ff] mb-4">Para Estudiantes</h2>
             <p className="text-gray-600 mb-6">Accede a tu kardex y gestiona tus documentos académicos de forma segura.</p>
             <Link
-              to="/estudiantes"
+              to="/students"
               className="inline-block w-full bg-[#184494ff] text-white py-3 px-6 rounded-lg text-center hover:bg-[#184494ff]/90 transition-colors"
             >
               Acceso Estudiantes
