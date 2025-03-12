@@ -2,12 +2,14 @@ import wallet from "../blockchainConnetion.js";
 import abiCredentialManagement from "../abi/abiCredentialManagement.js";
 import { ethers } from "ethers";
 import envConfig from "../../../envConfig.js";
+import StudentService from "../../../application/services/StudentService.js";
 
 class CredentialManagement {
     constructor() {
         this.contractAddress = envConfig.CONTRACT_ADDRESS_STUDENT_MANAGEMENT_CREDENTIALS || "";
         this.ABI = abiCredentialManagement
         this.contract = new ethers.Contract(this.contractAddress, this.ABI, wallet);
+        this.studentService = StudentService;
     }
 
     async emmitCredential(studentSIS) {
@@ -17,7 +19,7 @@ class CredentialManagement {
             try {
                 const tx = await this.contract.emmitCredential(studentSIS, address, 
                     publicKey);
-
+                this.studentService.assignedCredential(studentSIS);
                 await tx.wait();
 
                 return {mnemonic: menomic};

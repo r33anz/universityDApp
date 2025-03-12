@@ -17,6 +17,12 @@ Student.init({
     type: DataTypes.STRING,
     allowNull: false,
   },
+  hasCredential: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+    }
+  
 }, {
   sequelize,
   modelName: 'Student',
