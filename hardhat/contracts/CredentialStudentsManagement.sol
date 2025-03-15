@@ -10,7 +10,9 @@ contract CredentialStudentManagement is Ownable{
     struct Student{
         string codSIS; 
         address walletAddress;
+        bytes32 passwordHash;
         bytes publicKey;
+        string ipfsHash;
         uint256 issuedAt;
     }
 
@@ -35,6 +37,8 @@ contract CredentialStudentManagement is Ownable{
         students[studentSIS] = Student({
             codSIS: studentSIS,
             walletAddress: studentWallet,
+            passwordHash: bytes32(0),
+            ipfsHash: "",
             publicKey: studentPublicKey,
             issuedAt: block.timestamp
         });
@@ -44,7 +48,23 @@ contract CredentialStudentManagement is Ownable{
         emit CredentialStudentEmmited(studentSIS, studentWallet);         
     }
 
+    function setStudentPassword(string calldata sisCode, bytes32 passwordHash) public onlyOwner{
+        students[sisCode].passwordHash = passwordHash;
+    }
+
     function verifySISCodeByWalletAddres(address walletAddress) external view returns(string memory){
         return walletToCodSIS[walletAddress];
+    }
+
+    function getStudentPassword(string calldata sisCode) external view returns(bytes32){
+        return students[sisCode].passwordHash;
+    }
+
+    function setIPFSHash(string calldata sisCode, string calldata ipfsHash) public onlyOwner{
+        students[sisCode].ipfsHash = ipfsHash; 
+    }
+
+    function getAddressAndIPFSHash(string calldata sisCode) external view returns(address, string memory){
+        return (students[sisCode].walletAddress, students[sisCode].ipfsHash);
     }
 }
