@@ -2,7 +2,7 @@ import React,{useState} from "react";
 import { Button } from "../../../shared/components/Button";
 import {Input} from "../../../shared/components/Input";
 import {Label} from "../../../shared/components/Label";
-import SeedPhraseModal  from "../../wallet/components/SeedPhraseModal";
+import SeedPhraseModal  from "../../wallet/SeedPhraseModal";
 import { loginStudent } from "../service/studentService";
 import { useToastContext } from "../../../shared/providers/ToastProvider";
 import { ApiError } from "../../../shared/lib/apiError";

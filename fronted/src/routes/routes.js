@@ -1,8 +1,10 @@
-import React from "react";
+import React, { Children } from "react";
 import { Layout } from "../shared/components/Layout";
+import { LayoutDashboard } from "../shared/components/LayoutDashboard";
 
-const HomePage = React.lazy(() => import("../features/home/components/HomePage"));
-const StudentLoginPage = React.lazy(() => import("../features/auth/components/StudentLoginPaeg"));
+const HomePage = React.lazy(() => import("../features/home/HomePage"));
+const StudentLoginPage = React.lazy(() => import("../features/auth/StudentLoginPaeg"));
+const NotificationPage = React.lazy(()=> import("../features/notifications/NotificationPage"));
 
 export const routes = [
     {
@@ -14,9 +16,19 @@ export const routes = [
           element: <HomePage />,
         },
         {
-          path: "students",
+          path: "estudiante",
           element: <StudentLoginPage />,
         }
       ],
     },
+    {
+      path:"/administracion",
+      element: <LayoutDashboard/>,
+      children:[
+        {
+          path:"notificaciones",
+          element: <NotificationPage/>
+        }
+      ]
+    }
   ]
