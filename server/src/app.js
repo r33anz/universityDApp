@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import {createServer} from "http";
 import { Server } from "socket.io";
 import studentRoutes from "./interface/routes/studentRoutes.js";
+import notificationRoutes from "./interface/routes/notificationRoutes.js"
 import ListenBlockchainEvent from "./interface/events/ListenBlockchainEvent.js";
 
 dotenv.config();
@@ -17,6 +18,7 @@ const io = new Server(httpServer,{
 app.use(cors());    
 app.use(express.json());
 app.use('/api',studentRoutes);
+app.use('/api',notificationRoutes);
 
 io.on("connection", (socket) => {
     console.log("Nuevo cliente conectado:", socket.id);
