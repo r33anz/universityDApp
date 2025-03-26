@@ -13,27 +13,40 @@ class CredentialManagement {
     }
 
     async emmitCredential(studentSIS) {
-        const { address, menomic, publicKey } 
+        const {address, menomic, publicKey } 
             = this.#generateCredentials();
         
             try {
-                const tx = await this.contract.emmitCredential(studentSIS, address, 
-                    publicKey);
-                this.studentService.assignedCredential(studentSIS);
+                const tx = await this.contract.emmitCredential(studentSIS, address, publicKey);
                 await tx.wait();
+
+                this.studentService.assignedCredential(studentSIS);
+                await this.alocateBalance(address);
 
                 return {mnemonic: menomic};
             } catch (error) {
-                console.error(error);
+                console.error(error);z
                 throw new Error("Error emitiendo credencial");
             }
     }
 
+    async alocateBalance(studentAddress) {
+        const amountInEther = "0.01"
+
+        const tx = await wallet.sendTransaction({
+            to: studentAddress,
+            value: ethers.parseEther(amountInEther)
+        });
+
+        await tx.wait();
+        console.log("Balance alocated");
+    }
+
     #generateCredentials() {
-        const wallet = ethers.Wallet.createRandom();
-        const address = wallet.address;
-        const menomic = wallet.mnemonic.phrase;
-        const publicKey = wallet.publicKey;
+        const walletGenerate = ethers.Wallet.createRandom();
+        const address = walletGenerate.address;
+        const menomic = walletGenerate.mnemonic.phrase;
+        const publicKey = walletGenerate.publicKey;
 
         return {
             address,

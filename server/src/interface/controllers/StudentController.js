@@ -1,4 +1,4 @@
-import UseCaseEmmitStudentCredential from "../../application/usesCases/UseCaseEmmitStudentCredential.js";
+import UseCaseEmmitStudentCredential from "../../application/usesCases/studentCredential/UseCaseEmmitStudentCredential.js";
 import StudentSerror from "../error/studentErrors/studentErrors.js";
 class StudentController{
     async veryfyStudentInDB(req, res){
