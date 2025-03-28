@@ -17,25 +17,25 @@ class Notification extends Model {
 
 Notification.init({
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
     primaryKey: true,
     autoIncrement: true,
     allowNull: false 
   },
   title: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(25),
     allowNull: true 
   },
   message: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(125),
     allowNull: true 
   },
-  isAttended: {
-    type: DataTypes.BOOLEAN,
+  status: {
+    type: DataTypes.STRING(10),
     allowNull: true, 
     defaultValue: false 
   },
-  emmittedAt: {
+  emittedAt: {
     type: DataTypes.DATE,
     allowNull: true
   },
