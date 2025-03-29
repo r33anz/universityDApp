@@ -18,8 +18,8 @@ contract CredentialStudentManagement is Ownable {
     
     mapping (string => Student) public students; // SISCode -> Student
     
-    event RequestKardex(string indexed codSIS, uint256 timeRequested);
-    event ResponseKardex(string indexed codSIS, address studentAddressWallet, uint256 timeRequested);
+    event RequestKardex(string  codSIS, uint256 timeRequested);
+    event ResponseKardex(string  codSIS, address studentAddressWallet, uint256 timeRequested);
     
     constructor() Ownable(msg.sender) {
     }
