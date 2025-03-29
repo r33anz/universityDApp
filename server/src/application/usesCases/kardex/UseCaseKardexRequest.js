@@ -7,9 +7,10 @@ class UseCaseKardexRequest{
         const notification = {
             title:"Nueva peticion de kardex",
             body:`El estudiante con codigo ${codSIS} solicito la subida de su kardex.`,
-            emmittedAt:timeRequested
+            emittedAt:timeRequested,
+            from:codSIS
         }
-        
+
         await NotificationService.saveNotification(notification)
         const newDataNotification = await NotificationService.lastNotificacion()
         NotificationService.sendNotificationToClientSide(newDataNotification)

@@ -3,5 +3,9 @@
   "20250312030825-add-newField-to-students.cjs",
   "20250325143414-create-notification.cjs",
   "20250326045158-correct-notification-fields.cjs",
-  "20250326045756-correct-notification-fieldsV2.cjs"
+  "20250326045756-correct-notification-fieldsV2.cjs",
+  "20250328142153-modifying-notification-model.cjs",
+  "20250328153556-modifying-notification-modelV2.cjs",
+  "20250328155458-modifying-notification-modelV3.cjs",
+  "20250329185026-modifying-notification-mode-adding-colunm.cjs"
 ]

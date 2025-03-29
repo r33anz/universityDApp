@@ -31,9 +31,13 @@ Notification.init({
     allowNull: true 
   },
   status: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING(25),
     allowNull: true, 
-    defaultValue: false 
+    defaultValue: "not_attended" 
+  },
+  from: {
+    type: DataTypes.STRING(25),
+    allowNull: true,  
   },
   emittedAt: {
     type: DataTypes.DATE,
