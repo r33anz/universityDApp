@@ -1,3 +1,4 @@
+import EmailService from "../../services/EmailService.js";
 import NotificationService from "../../services/NotificationService.js";
 
 class UseCaseNotification{
@@ -13,6 +14,11 @@ class UseCaseNotification{
     }
 
     async attendNotifications(notificationIds){
+
+        const recipientEmial = "rodrigo33newton@gmail.com";
+        const sisCode = await NotificationService.recoverSisCodes(notificationIds);
+        await EmailService.sendSisCodes(recipientEmial,sisCode);
+
         return await NotificationService.attendNotifications(notificationIds);
     }
 

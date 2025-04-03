@@ -62,12 +62,9 @@ class NotificationController{
           }
       
           const result = await UseCaseNotification.attendNotifications(notificationIds);
-          
-          console.log("resultado",result)
 
-          res.json({
+          res.status(200).json({
             success: true,
-            message: `${result.updatedCount} notificación(es) actualizada(s)`,
             updatedCount: result.updatedCount,
             fromList: result.fromList 
           });

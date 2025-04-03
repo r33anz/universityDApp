@@ -3,14 +3,11 @@ const path = require('path');
 const dotenv = require('dotenv');
 
 dotenv.config();
-console.log("Current working directory:", process.cwd());
 
 module.exports = async () => {
   // Dynamically import the ES module
   const envConfigModule = await import('../../envConfig.js');
   const envConfig = envConfigModule.default;
-  
-  console.log("DB_USER:", envConfig.DB_USER);
   
   return {
     development: {

@@ -125,13 +125,28 @@ class NotificationService{
           
           return {
             success: true,
-            updatedCount: result[0],
             fromList: await this.getFromList(notificationIds)
           };
         } catch (error) {
           console.error("Error attending notifications:", error);
           throw error;
         }
+    }
+
+    async recoverSisCodes(notificationIds){
+      try {
+        const result = await notification.findAll({
+          where: {
+            id: notificationIds,
+          },
+          attributes: ['from']
+        })
+
+        return result.map(n => n.from);
+      } catch (error) {
+        console.error("Error attending notifications and sending mail:", error);
+          throw error;
+      }
     }
       
     async getFromList(notificationIds) {

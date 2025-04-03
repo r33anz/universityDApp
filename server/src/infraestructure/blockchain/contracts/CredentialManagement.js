@@ -30,6 +30,17 @@ class CredentialManagement {
             }
     }
 
+    async setIPFSHash(siscode,hash){
+        try {
+            const tx = await this.contract.setIPFSHash(siscode,hash);
+            await tx.wait();
+
+        } catch (error) {
+            console.error(error);z
+            throw new Error("Error seteando el hash");
+        }
+    }
+
     async alocateBalance(studentAddress) {
         const amountInEther = "0.01"
 

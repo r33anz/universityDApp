@@ -6,6 +6,7 @@ import { Server } from "socket.io";
 import studentRoutes from "./interface/routes/studentRoutes.js";
 import notificationRoutes from "./interface/routes/notificationRoutes.js"
 import ListenBlockchainEvent from "./interface/events/ListenBlockchainEvent.js";
+import pdfRoutes from "./interface/routes/pdfRoutes.js";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api',studentRoutes);
 app.use('/api',notificationRoutes);
+app.use('/api',pdfRoutes);
 
 io.on("connection", (socket) => {
     console.log("Nuevo cliente conectado:", socket.id);

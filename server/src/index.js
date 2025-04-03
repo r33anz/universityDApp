@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import {app,io} from "./app.js";
-import initiaizeWeb3Storage from "./infraestructure/ipfs/ipfsConnection.js";
+import ipfsConnection from "./infraestructure/ipfs/ipfsConnection.js";
 import sequelize from "./infraestructure/db/dbConnection.js";
 
 dotenv.config();
@@ -15,7 +15,7 @@ sequelize.sync({ force: false })
 app.listen(PORT, async () => {
     console.log(`Server running on port ${PORT}`);
     try {
-        await initiaizeWeb3Storage();
+        await ipfsConnection.initialize();
         console.log("Web3.storage inicializado");
         io.emit("server_ready", { message: "Servidor listo", time: new Date() });
     } catch (error) {
