@@ -19,7 +19,6 @@ contract CredentialStudentManagement is Ownable {
     mapping (string => Student) public students; // SISCode -> Student
     
     event RequestKardex(string  codSIS, uint256 timeRequested);
-    event ResponseKardex(string  codSIS, address studentAddressWallet, uint256 timeRequested);
     
     constructor() Ownable(msg.sender) {
     }
@@ -51,10 +50,7 @@ contract CredentialStudentManagement is Ownable {
     }
     
     function setIPFSHash(string calldata sisCode, string calldata ipfsHash) external onlyOwner {
-        address studentAddressWallet = students[sisCode].walletAddress;
         students[sisCode].ipfsHash = ipfsHash;
-        
-        emit ResponseKardex(sisCode, studentAddressWallet, block.timestamp);
     }
     
     function getAddressAndIPFSHash(string calldata sisCode) external view returns(address, string memory) {
