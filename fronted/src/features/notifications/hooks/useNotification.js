@@ -118,7 +118,7 @@ export function useNotifications(){
         }
       });
 
-      if(response.success){
+      if(response.data.success){
         setIsModalOpen(false);
         setSelectedNotifications([]);
         await loadNotifications({ page: 1 });

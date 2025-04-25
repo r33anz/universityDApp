@@ -5,6 +5,7 @@ import { LayoutDashboard } from "../shared/components/LayoutDashboard";
 const HomePage = React.lazy(() => import("../features/home/HomePage"));
 const StudentLoginPage = React.lazy(() => import("../features/auth/StudentLoginPaeg"));
 const NotificationPage = React.lazy(()=> import("../features/notifications/NotificationPage"));
+const FileConverterPage = React.lazy(()=> import("../features/file-converter/FileConverterPage"));
 
 export const routes = [
     {
@@ -28,6 +29,10 @@ export const routes = [
         {
           path:"notificaciones",
           element: <NotificationPage/>
+        },
+        {
+          path:"manejo_archivo",
+          element: <FileConverterPage/>
         }
       ]
     }

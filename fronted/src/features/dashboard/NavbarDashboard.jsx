@@ -21,9 +21,11 @@ export function NavbarDashboard() {
                     <Link to="/administracion/notificaciones" className="text-xl text-white hover:text-[#e3b505ff] transition-colors">
                         Notificaciones
                     </Link>
-                    {/*<Link to="/subirArchivos" className="text-xl text-white hover:text-[#e3b505ff] transition-colors font-medium">
-                        Estudiantes
-                    </Link>*/}
+
+                    <Link to="/administracion/manejo_archivo" className="text-xl text-white hover:text-[#e3b505ff] transition-colors">
+                        Subida de Archivo
+                    </Link>
+                    
                 </nav>
                 <div className="md:hidden">
                     <Button variant="ghost" size="sm">
