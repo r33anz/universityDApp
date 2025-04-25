@@ -11,7 +11,7 @@ class EmailService {
         const mailOptions = {
           from: `"Soporte Universidad" <${process.env.EMAIL_USER}>`,
           to: email,
-          subject: 'Tus códigos de recuperación',
+          subject: 'Solicitud de kardex',
           html: recoveryCodesTemplate(codes)
         };
   

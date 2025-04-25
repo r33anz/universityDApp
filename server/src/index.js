@@ -16,10 +16,12 @@ app.listen(PORT, async () => {
     console.log(`Server running on port ${PORT}`);
     try {
         await ipfsConnection.initialize();
-        console.log("Web3.storage inicializado");
+        console.log("IPFS inicializado");
+
         io.emit("server_ready", { message: "Servidor listo", time: new Date() });
+    
     } catch (error) {
-        console.error("Error inicializando web3.storage:", error)       
+        console.error("Error ", error)       
         process.exit(1);
     }
 });

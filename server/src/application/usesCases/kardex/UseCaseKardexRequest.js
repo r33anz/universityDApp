@@ -2,6 +2,7 @@ import NotificationService from "../../services/NotificationService.js";
 import IpfsService from "../../services/IpfsService.js";
 import CredentialManagement from "../../../infraestructure/blockchain/contracts/CredentialManagement.js";
 
+
 class UseCaseKardexRequest{
 
     async listeningResquest(codSIS,timeRequested){
@@ -18,25 +19,37 @@ class UseCaseKardexRequest{
         NotificationService.sendNotificationToClientSide(newDataNotification)
     }
 
-    async uploadingKardexToIPFS(pdfData){
+    async uploadingKardexToIPFS(pdfList) {
         try {
-            const result = await IpfsService.uploadFile(
-              pdfData.buffer,
-              pdfData.filename
-            );
-            
-            console.log(pdfData.sisCode)
-
-            if(result.success){
-                await CredentialManagement.setIPFSHash(pdfData.sisCode,result.cid)  
+            if (!Array.isArray(pdfList) || pdfList.length === 0) {
+                throw new Error('Datos de PDF incompletos');
             }
 
-            return {
-                success:true
+            // 1. Subir a IPFS Local (Kubo)
+            const ipfsResult = await IpfsService.uploadMultiplePdfs(pdfList);
+            const sisCode = pdfList[0].path.replace(/\//g, "");
+
+            // 2. Generar enlaces locales
+            const localLinks = {
+                gateway: `http://localhost:8080/ipfs/${ipfsResult.dirCid}`,
+                api: `http://localhost:5001/api/v0/cat?arg=${ipfsResult.dirCid}`,
+                mfsPath: `/kardex/${sisCode}`
             };
-          } catch (error) {
+
+            return {
+                success: true,
+                files: ipfsResult.files,
+                dirCid: ipfsResult.dirCid,
+                storageInfo: {
+                    local: {
+                        ipfsLink: localLinks.gateway,
+                        mfsPath: localLinks.mfsPath
+                    }
+                }
+            };
+        } catch (error) {
             throw new Error(`Error al subir PDF: ${error.message}`);
-          }
+        }
     }
 }
 

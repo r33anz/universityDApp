@@ -1,6 +1,7 @@
 import notification from "../../infraestructure/db/models/notification.js"
 import { io } from "../../app.js";
 import dayjs from "dayjs";
+import { STATUS_ENUM } from "../../interface/enums/statusEnums.js";
 
 class NotificationService{
     
@@ -113,12 +114,12 @@ class NotificationService{
         try {
           const result = await notification.update(
             { 
-              status: 'in_process'
+              status: STATUS_ENUM.IN_PROCESS
             },
             {
               where: {
                 id: notificationIds,
-                status: 'not_attended'
+                status: STATUS_ENUM.NOT_ATTENDED
               }
             }
           );
@@ -131,6 +132,37 @@ class NotificationService{
           console.error("Error attending notifications:", error);
           throw error;
         }
+    }
+
+    async updateNotificatioToAttended(sisCode){
+      try {
+        if (!sisCode) {
+          throw new Error("SIS code is required");
+        }
+        const [updatedCount] = await notification.update(
+          {
+            status: STATUS_ENUM.ATTENDED,
+            attendedAt: new Date()
+          },
+          {
+            where: {
+              from: sisCode,
+              status: STATUS_ENUM.IN_PROCESS
+            }
+          }
+        );
+    
+        return {
+          success: true
+        };
+      } catch (error) {
+        console.error("Error updating notifications:", error);
+        return {
+          success: false,
+          message: error.message,
+          error
+        };
+      }
     }
 
     async recoverSisCodes(notificationIds){

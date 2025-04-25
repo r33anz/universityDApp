@@ -65,31 +65,6 @@ const abiCredentialManagement =  [
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "codSIS",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "studentAddressWallet",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "timeRequested",
-        "type": "uint256"
-      }
-    ],
-    "name": "ResponseKardex",
-    "type": "event"
-  },
-  {
     "inputs": [
       {
         "internalType": "string",

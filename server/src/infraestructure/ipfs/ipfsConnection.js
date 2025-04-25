@@ -1,49 +1,53 @@
-import { create } from "@web3-storage/w3up-client";
+import { create } from 'ipfs-http-client';
+import envConfig from '../../envConfig.js';
 
 class IPFSConnection {
   constructor() {
     this.client = null;
-    this.space = null;
-    this.initialized = false;
   }
 
   async initialize() {
-    if (this.initialized) return;
+    if (this.client) return;
 
     try {
-      this.client = await create();
-      this.space = await this.client.createSpace("preExperimento");
-      
-      const myAccount = await this.client.login("rodrigo33newton@gmail.com");
-      
-      while (true) {
-        const res = await myAccount.plan.get();
-        if (res.ok) break;
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
+      this.client = create({
+        url: envConfig.IPFS_API || 'http://127.0.0.1:5001'
+      });
 
-      await myAccount.provision(this.space.did());
-      await this.space.save();
-      await this.client.setCurrentSpace(this.space.did());
-      
-      this.initialized = true;
-      console.log("Web3.Storage configurado correctamente");
+      const version = await this.client.version();
+      console.log("✅ IPFS HTTP Client conectado:", version.version);
     } catch (error) {
-      console.error("Error inicializando Web3.Storage:", error);
+      console.error("❌ Error al conectar IPFS HTTP:", error.message);
       throw error;
     }
   }
 
   async uploadFile(file) {
-    if (!this.initialized) {
-      await this.initialize();
-    }
-
     try {
-      const cid = await this.client.uploadFile(file);
+      const { cid } = await this.client.add(file);
       return cid.toString();
     } catch (error) {
-      console.error("Error subiendo archivo:", error);
+      console.error('Error subiendo archivo:', error);
+      throw error;
+    }
+  }
+
+  async addToMfs(cid, path) {
+    try {
+      await this.client.files.cp(`/ipfs/${cid}`, path, { parents: true });
+      console.log(`📁 Archivo añadido a MFS: ${path}`);
+    } catch (error) {
+      console.error('Error en MFS:', error);
+      throw error;
+    }
+  }
+
+  async getMfsDirectoryCid(path) {
+    try {
+      const stats = await this.client.files.stat(path);
+      return stats.cid.toString();
+    } catch (error) {
+      console.error('Error obteniendo CID de directorio:', error);
       throw error;
     }
   }

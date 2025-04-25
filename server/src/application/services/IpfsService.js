@@ -2,22 +2,89 @@ import ipfsConnection from "../../infraestructure/ipfs/ipfsConnection.js";
 import { Blob } from 'buffer';
 
 class IPFSService{
-
-    async uploadFile(pdfBuffer,filename){
+    async uploadMultiplePdfs(pdfs) {
         try {
-            const blob = new Blob([pdfBuffer], {
-                type: 'application/pdf'
-            });
-            const cid = await ipfsConnection.uploadFile(blob);
-                        
+            if (!ipfsConnection.client) {
+                throw new Error('La conexión IPFS no está inicializada');
+            }
+            const results = [];
+            const basePath = `/${pdfs[0].path.split('/')[1]}`; // Ej: '/1234567'
+
+            // 1. Crear directorio base si no existe
+            await this.createDirectoryStructure(pdfs);
+            
+            for (const pdf of pdfs) {
+                if (!pdf.path || !pdf.blob) {
+                    throw new Error('Cada archivo debe tener path y blob');
+                }
+
+                // 2. Subir archivo a IPFS
+                const { cid } = await ipfsConnection.client.add(pdf.blob);
+                
+                // 3. Copiar a MFS (crea directorios automáticamente)
+                const fullPath = `${pdf.path}${pdf.filename}`;
+                await ipfsConnection.client.files.cp(`/ipfs/${cid}`, fullPath);
+
+                results.push({
+                    filename: pdf.filename,
+                    path: fullPath,
+                    cid: cid.toString()
+                });
+            }
+
+            // 4. Obtener CID del directorio raíz en MFS
+            const rootStats = await ipfsConnection.client.files.stat(basePath);
+            const rootCid = rootStats.cid.toString();
+
             return {
-              success: true,
-              cid
+                success: true,
+                files: results,
+                dirCid: rootCid,
+                storageInfo: {
+                    local: {
+                        ipfsLink: `http://localhost:8080/ipfs/${rootCid}`,
+                        mfsPath: `/kardex${basePath}`
+                    }
+                }
             };
-          } catch (error) {
-            console.error('Error en IpfsService:', error);
-            throw error;
-          }
+        
+            
+          }  catch (error) {
+          throw new Error(`Error en IPFSService: ${error.message}`);
+        }
+      }
+
+      async createDirectoryStructure(pdfs) {
+        const createdPaths = new Set();
+        
+        for (const pdf of pdfs) {
+            const pathParts = pdf.path.split('/').filter(Boolean);
+            let currentPath = '';
+            
+            for (const part of pathParts) {
+                currentPath += `/${part}`;
+                if (!createdPaths.has(currentPath)) {
+                    try {
+                        await ipfsConnection.client.files.mkdir(currentPath, { parents: true });
+                        createdPaths.add(currentPath);
+                    } catch (error) {
+                        if (!error.message.includes('already exists')) {
+                            throw error;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    async safeCopyToMfs(cid, fullPath) {
+        try {
+            await ipfsConnection.client.files.cp(`/ipfs/${cid}`, fullPath);
+            console.log(`✅ Archivo copiado a MFS: ${fullPath}`);
+        } catch (error) {
+            console.error(`❌ Error copiando ${fullPath}:`, error.message);
+            throw new Error(`No se pudo copiar a MFS: ${fullPath}`);
+        }
     }
 }
 
