@@ -20,6 +20,7 @@
     "ipfs-http-client": "^60.0.1",
     "multer": "^1.4.5-lts.2",
     "nodemailer": "^6.10.0",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.13.3",
     "sequelize": "^6.37.6",
     "sequelize-cli": "^6.6.2",

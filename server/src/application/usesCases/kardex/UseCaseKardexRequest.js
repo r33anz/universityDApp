@@ -1,7 +1,7 @@
 import NotificationService from "../../services/NotificationService.js";
 import IpfsService from "../../services/IpfsService.js";
 import CredentialManagement from "../../../infraestructure/blockchain/contracts/CredentialManagement.js";
-
+import MergeFileService from "../../services/MergeFileService.js";
 
 class UseCaseKardexRequest{
 
@@ -25,30 +25,27 @@ class UseCaseKardexRequest{
                 throw new Error('Datos de PDF incompletos');
             }
 
-            // 1. Subir a IPFS Local (Kubo)
-            const ipfsResult = await IpfsService.uploadMultiplePdfs(pdfList);
-            const sisCode = pdfList[0].path.replace(/\//g, "");
+            const sisCode = pdfList[0].sisCode;
+            const mergefiles = await MergeFileService.processFiles(pdfList);
+            const ipfsResult = await IpfsService.uploadMultiplePdfs(
+                mergefiles.map(f => ({
+                  blob: f.blob,
+                  filename: f.mergedFilename,
+                  path: f.path
+                }))
+              );
 
-            // 2. Generar enlaces locales
-            const localLinks = {
-                gateway: `http://localhost:8080/ipfs/${ipfsResult.dirCid}`,
-                api: `http://localhost:5001/api/v0/cat?arg=${ipfsResult.dirCid}`,
-                mfsPath: `/kardex/${sisCode}`
-            };
+            //implementar contrato
 
             return {
                 success: true,
-                files: ipfsResult.files,
-                dirCid: ipfsResult.dirCid,
-                storageInfo: {
-                    local: {
-                        ipfsLink: localLinks.gateway,
-                        mfsPath: localLinks.mfsPath
-                    }
-                }
+                //files: ipfsResult.files,
+                //dirCid: ipfsResult.dirCid,
+                //link: `http://localhost:8080/ipfs/${ipfsResult.dirCid}`
             };
         } catch (error) {
-            throw new Error(`Error al subir PDF: ${error.message}`);
+            console.error('Error al subir PDF en el caso de uso:', error);
+            //throw new Error(`Error al subir PDF: ${error.message}`);
         }
     }
 }

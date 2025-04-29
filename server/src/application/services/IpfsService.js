@@ -7,10 +7,10 @@ class IPFSService{
             if (!ipfsConnection.client) {
                 throw new Error('La conexión IPFS no está inicializada');
             }
+            
             const results = [];
-            const basePath = `/${pdfs[0].path.split('/')[1]}`; // Ej: '/1234567'
+            const basePath = `/${pdfs[0].path.split('/')[1]}`; 
 
-            // 1. Crear directorio base si no existe
             await this.createDirectoryStructure(pdfs);
             
             for (const pdf of pdfs) {
@@ -18,10 +18,7 @@ class IPFSService{
                     throw new Error('Cada archivo debe tener path y blob');
                 }
 
-                // 2. Subir archivo a IPFS
                 const { cid } = await ipfsConnection.client.add(pdf.blob);
-                
-                // 3. Copiar a MFS (crea directorios automáticamente)
                 const fullPath = `${pdf.path}${pdf.filename}`;
                 await ipfsConnection.client.files.cp(`/ipfs/${cid}`, fullPath);
 
@@ -32,25 +29,17 @@ class IPFSService{
                 });
             }
 
-            // 4. Obtener CID del directorio raíz en MFS
             const rootStats = await ipfsConnection.client.files.stat(basePath);
             const rootCid = rootStats.cid.toString();
 
             return {
                 success: true,
-                files: results,
                 dirCid: rootCid,
-                storageInfo: {
-                    local: {
-                        ipfsLink: `http://localhost:8080/ipfs/${rootCid}`,
-                        mfsPath: `/kardex${basePath}`
-                    }
-                }
+                ipfsLink: `http://localhost:8080/ipfs/${rootCid}`
             };
-        
-            
           }  catch (error) {
-          throw new Error(`Error en IPFSService: ${error.message}`);
+                console.error('Error en IPFSService', error);
+                //throw new Error(`Error en IPFSService: ${error.message}`);
         }
       }
 
@@ -80,10 +69,10 @@ class IPFSService{
     async safeCopyToMfs(cid, fullPath) {
         try {
             await ipfsConnection.client.files.cp(`/ipfs/${cid}`, fullPath);
-            console.log(`✅ Archivo copiado a MFS: ${fullPath}`);
+            console.log(`Archivo copiado a MFS: ${fullPath}`);
         } catch (error) {
-            console.error(`❌ Error copiando ${fullPath}:`, error.message);
-            throw new Error(`No se pudo copiar a MFS: ${fullPath}`);
+            console.error(`Error copiando ${fullPath}:`, error.message);
+            //throw new Error(`No se pudo copiar a MFS: ${fullPath}`);
         }
     }
 }
