@@ -9,18 +9,13 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
     
     struct KardexInfo {
         address student;           
-        string studentId;         
-        string institutionName;   
+        string studentId;  
         uint256 totalSubjects;    
         uint256 lastUpdated;      
-        string currentIpfsCid;    
-        string currentSemester;   
+        string currentIpfsCid;
         bool isActive;           
         uint256 version;          
     }
-
-    string public institutionName = "Universidad Mayor de San Simon";
-    
     // tokenID -> KardexInfo
     mapping(uint256 => KardexInfo) public kardexInfo;
     
@@ -33,21 +28,9 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
     uint256 private _tokenIdCounter = 0;
     
     // Events
-    event KardexMinted(
-        uint256 indexed tokenId,
-        address indexed student
-    );
-    
-    event KardexProgressed(
-        uint256 indexed tokenId,
-        address indexed student,
-        uint256 version
-    );
-
-    event KardexDeleted(
-        uint256 indexed tokenId,
-        address indexed student
-    );
+    event KardexMinted(uint256 indexed tokenId,address indexed student);
+    event KardexProgressed(uint256 indexed tokenId,address indexed student,uint256 version);
+    event KardexDeleted(uint256 indexed tokenId,address indexed student);
     
     constructor() ERC721("UMSSKardex", "UMSSKRDX") Ownable(msg.sender) {
         // Constructor for OpenZeppelin v5
@@ -57,7 +40,6 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
         address student,
         string memory studentId,
         uint256 initialSubjects,
-        string memory currentSemester,
         string memory ipfsCid,
         string memory metadataUri
     ) public onlyOwner returns (uint256) {
@@ -76,11 +58,9 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
         kardexInfo[tokenId] = KardexInfo({
             student: student,
             studentId: studentId,
-            institutionName: institutionName,
             totalSubjects: initialSubjects,
             lastUpdated: block.timestamp,
             currentIpfsCid: ipfsCid,
-            currentSemester: currentSemester,
             isActive: true,
             version: 1
         });
@@ -95,7 +75,6 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
     function updateStudentProgress(
         address student,
         uint256 newTotalSubjects,
-        string memory newSemester,
         string memory newIpfsCid,
         string memory newMetadataUri
     ) public onlyOwner {
@@ -107,7 +86,6 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
         KardexInfo storage kardex = kardexInfo[tokenId];
         
         kardex.totalSubjects = newTotalSubjects;
-        kardex.currentSemester = newSemester;
         kardex.currentIpfsCid = newIpfsCid;
         kardex.lastUpdated = block.timestamp;
         kardex.version++; 
@@ -134,7 +112,6 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
     function getStudentProgress(address student) public view returns (
         uint256 tokenId,
         uint256 totalSubjects,
-        string memory currentSemester,
         uint256 version,
         uint256 lastUpdated
     ) {
@@ -145,7 +122,6 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
         return (
             tokenId,
             kardex.totalSubjects,
-            kardex.currentSemester,
             kardex.version,
             kardex.lastUpdated
         );
