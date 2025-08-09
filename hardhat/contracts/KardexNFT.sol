@@ -134,10 +134,25 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
     {
         address from = _ownerOf(tokenId);
         
-        // Prevent transfers except minting (from=0) and burning (to=0)
         require(from == address(0) || to == address(0), "NFT no transferible");
         
         return super._update(to, tokenId, auth);
+    }
+
+    function _approve(address to, uint256 tokenId, address auth, bool emitEvent)
+        internal
+        override
+    {
+        require(to == address(0), "NFT no transferible");
+        super._approve(to, tokenId, auth, emitEvent);
+    }
+
+    function setApprovalForAll(address operator, bool approved)
+        public
+        override(ERC721, IERC721)
+    {
+        require(!approved, "NFT no transferible");
+        super.setApprovalForAll(operator, approved);
     }
 
     function burnKardex(uint256 tokenId) public onlyOwner {
@@ -147,7 +162,6 @@ contract KardexNFT is ERC721, ERC721URIStorage, Ownable {
         address student = kardex.student;
         string memory studentId = kardex.studentId;
         
-        // Clean up mappings before burning
         delete studentToToken[student];                
         delete studentIdToToken[studentId];               
         delete kardexInfo[tokenId];  
