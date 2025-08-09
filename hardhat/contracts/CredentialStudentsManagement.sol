@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract CredentialStudentManagement is Ownable {
-    using ECDSA for bytes32;
-    
+contract CredentialStudentManagement {
+  
+    address public owner;
     struct Student {
         string codSIS;
         address walletAddress;
@@ -16,20 +14,25 @@ contract CredentialStudentManagement is Ownable {
         uint256 issuedAt;
     }
     
-    mapping (string => Student) public students; // SISCode -> Student
     
-    event RequestKardex(string  codSIS, uint256 timeRequested);
+    mapping (string => Student) public students; // SisCode => Student info
+    mapping(address => string) public walletToSIS;     //wallet => SisCode
     
-    constructor() Ownable(msg.sender) {
+    event RequestKardex(string  codSIS, address indexed wallet, uint256 timeRequested);
+    event CredentialIssued(string codSIS, address walletAddress, uint256 issuedAt);
+
+    constructor(){
+        owner = payable(msg.sender);
     }
     
     function emmitCredential(
         string calldata studentSIS,
         address studentWallet,
         bytes calldata studentPublicKey
-    ) public onlyOwner {
+    ) public  {
+        require(msg.sender == owner, "Solo el propietario puede emitir credenciales");
         require(bytes(students[studentSIS].codSIS).length == 0,
-            "Student already exists");
+            "El estudiante ya existe");
 
         students[studentSIS] = Student({
             codSIS: studentSIS,
@@ -39,17 +42,22 @@ contract CredentialStudentManagement is Ownable {
             publicKey: studentPublicKey,
             issuedAt: block.timestamp
         });
+
+        walletToSIS[studentWallet] = studentSIS;
+
+        emit CredentialIssued(studentSIS, studentWallet, block.timestamp);
     }
     
     function setStudentPassword(string calldata sisCode, bytes32 passwordHash) external {
         
         require(msg.sender == students[sisCode].walletAddress, 
-            "Only student or owner can set password");
+            "Solo el estudiante puede establecer la contrasenia");
 
         students[sisCode].passwordHash = passwordHash;
     }
     
-    function setIPFSHash(string calldata sisCode, string calldata ipfsHash) external onlyOwner {
+    function setIPFSHash(string calldata sisCode, string calldata ipfsHash) external {
+        require(msg.sender == owner,"Solo el propietario puede establecer el IPFS Hash");
         students[sisCode].ipfsHash = ipfsHash;
     }
     
@@ -60,14 +68,27 @@ contract CredentialStudentManagement is Ownable {
     function getStudentPassword(string calldata sisCode) external view returns(bytes32) {
         
         require(msg.sender == students[sisCode].walletAddress, 
-            "Only student or owner can view password hash");
+            "Solo el estudiante puede obtener la contrasenia");
 
         return students[sisCode].passwordHash;
     }
     
-    function requestKardex(string calldata codSIS) external {
-        require(bytes(students[codSIS].codSIS).length > 0, "Student does not exist");
-        
-        emit RequestKardex(codSIS, block.timestamp);
+    function requestKardex(string calldata codSIS) public payable {
+        require(bytes(students[codSIS].codSIS).length > 0, 
+            "El estudiante no existe");
+        require(msg.sender == students[codSIS].walletAddress, 
+            "Solo el estudiante puede solicitar el kardex");
+        require(msg.value > 0, "Pago requerido");
+
+        (bool success ,) = payable(owner).call{value: msg.value}("");
+        require(success, "Transferencia fallida");
+        emit RequestKardex(codSIS, msg.sender, block.timestamp);
     }
+
+    function verifyWalletToSIS(address studentWallet) external view returns(string memory) {
+        require(bytes(walletToSIS[studentWallet]).length > 0, 
+            "El estudiante no existe");
+        return walletToSIS[studentWallet];
+    }
+
 }
