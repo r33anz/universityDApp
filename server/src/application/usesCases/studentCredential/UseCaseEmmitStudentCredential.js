@@ -1,6 +1,6 @@
 import StudentService from "../../services/StudentService.js"
 import CredentialManagement from "../../../infraestructure/blockchain/contracts/CredentialManagement.js"
-import StudentSerror from "../../../interface/error/studentErrors/studentErrors.js";
+import StudentSerror from "../../../interface/error/studentErrors.js";
 
 class UseCaseEmmitStudentCredential{
 
