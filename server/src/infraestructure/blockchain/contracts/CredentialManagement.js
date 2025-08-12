@@ -3,6 +3,7 @@ import abiCredentialManagement from "../abi/abiCredentialManagement.js";
 import { ethers } from "ethers";
 import envConfig from "../../../envConfig.js";
 import StudentService from "../../../application/services/StudentService.js";
+import ContractError from "../../../interface/error/contractErrors.js";
 
 class CredentialManagement {
     constructor() {
@@ -18,26 +19,100 @@ class CredentialManagement {
         
             try {
                 const tx = await this.contract.emmitCredential(studentSIS, address, publicKey);
-                await tx.wait();
+                const receipt = await tx.wait();
+
+                if (receipt.status === 0) {
+                    throw new ContractError(
+                        "Transacción revertida",
+                        "TX_REVERTED",
+                        { transactionHash: receipt.transactionHash }
+                    );
+                }
 
                 this.studentService.assignedCredential(studentSIS);
                 await this.alocateBalance(address);
 
+                console.log(`Credencial emitida para el estudiante ${studentSIS}`);
                 return {mnemonic: menomic};
             } catch (error) {
-                console.error(error);z
-                throw new Error("Error emitiendo credencial");
+                if (error.code === 'CALL_EXCEPTION') {
+                    throw new ContractError(
+                        "Error en la llamada al contrato",
+                        "CALL_EXCEPTION",
+                        {
+                            reason: error.reason,
+                            method: error.method,
+                            args: error.args
+                        }
+                    );
+                } else if (error.code === 'INSUFFICIENT_FUNDS') {
+                    throw new ContractError(
+                        "Fondos insuficientes para la transacción",
+                        "INSUFFICIENT_FUNDS",
+                        { requiredGas: error.error?.gas }
+                    );
+                } else if (error.code === 'NETWORK_ERROR') {
+                    throw new ContractError(
+                        "Error de red al interactuar con la blockchain",
+                        "NETWORK_ERROR",
+                        { network: wallet.provider.network }
+                    );
+                } else if (error instanceof ContractError) {
+                    throw error;
+                } else {
+                    throw new ContractError(
+                        "Error desconocido al interactuar con el contrato",
+                        "UNKNOWN_CONTRACT_ERROR",
+                        { originalError: error.message }
+                    );
+                }
             }
     }
 
     async setIPFSHash(siscode,hash){
         try {
             const tx = await this.contract.setIPFSHash(siscode,hash);
-            await tx.wait();
+            const receipt = await tx.wait();
 
+            if (receipt.status === 0) {
+                throw new ContractError(
+                    "Transacción revertida",
+                    "TX_REVERTED",
+                    { transactionHash: receipt.transactionHash }
+                );
+            }
         } catch (error) {
-            console.error(error);z
-            throw new Error("Error seteando el hash");
+            if (error.code === 'CALL_EXCEPTION') {
+                throw new ContractError(
+                    "Error en la llamada al contrato",
+                    "CALL_EXCEPTION",
+                    {
+                        reason: error.reason,
+                        method: error.method,
+                        args: error.args
+                    }
+                );
+            } else if (error.code === 'INSUFFICIENT_FUNDS') {
+                throw new ContractError(
+                    "Fondos insuficientes para la transacción",
+                    "INSUFFICIENT_FUNDS",
+                    { requiredGas: error.error?.gas }
+                );
+            } else if (error.code === 'NETWORK_ERROR') {
+                throw new ContractError(
+                    "Error de red al interactuar con la blockchain",
+                    "NETWORK_ERROR",
+                    { network: wallet.provider.network }
+                );
+            } else if (error instanceof ContractError) {
+                throw error;
+            } else {
+                throw new ContractError(
+                    "Error desconocido al interactuar con el contrato",
+                    "UNKNOWN_CONTRACT_ERROR",
+                    { originalError: error.message }
+                );
+            }
         }
     }
 
@@ -50,7 +125,6 @@ class CredentialManagement {
         });
 
         await tx.wait();
-        console.log("Balance alocated");
     }
 
     #generateCredentials() {
