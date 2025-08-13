@@ -11,9 +11,9 @@ class CredentialManagement {
         this.contract = new ethers.Contract(this.contractAddress, this.ABI, wallet);
     }
 
-    async emmitCredential(studentSIS,address, publicKey) {
+    async emmitCredential(studentSIS,address) {
             try {
-                const tx = await this.contract.emmitCredential(studentSIS, address, publicKey);
+                const tx = await this.contract.emmitCredential(studentSIS, address);
                 const receipt = await tx.wait();
 
                 if (receipt.status === 0) {
@@ -101,6 +101,37 @@ class CredentialManagement {
             } else {
                 throw new ContractError(
                     "Error desconocido al interactuar con el contrato",
+                    "UNKNOWN_CONTRACT_ERROR",
+                    { originalError: error.message }
+                );
+            }
+        }
+    }
+    
+    async getAddress(sisCode){
+        try{
+            const address = await this.contract.getAddress(sisCode);
+            return address;
+        }catch(error) {
+            if (error.code === 'CALL_EXCEPTION') {
+                throw new ContractError(
+                    "Error en la llamada al contrato",
+                    "CALL_EXCEPTION",
+                    {
+                        reason: error.reason,
+                        method: error.method,
+                        args: error.args
+                    }
+                );
+            } else if (error.code === 'NETWORK_ERROR') {
+                throw new ContractError(
+                    "Error de red al interactuar con la blockchain",
+                    "NETWORK_ERROR",
+                    { network: wallet.provider.network }
+                );
+            } else {
+                throw new ContractError(
+                    "Error desconocido al obtener la dirección del estudiante",
                     "UNKNOWN_CONTRACT_ERROR",
                     { originalError: error.message }
                 );

@@ -5,11 +5,11 @@ import StudentService from './StudentService.js';
 class CredentialManagementService{
 
     async emmitCredential(studentSIS) {
-         const {address, menomic, publicKey } 
+         const {address, menomic } 
             = this.#generateCredentials();
 
         try{
-            const tx = await CredentialManagement.emmitCredential(studentSIS,address, publicKey);
+            const tx = await CredentialManagement.emmitCredential(studentSIS,address);
             if(tx){
                 StudentService.assignedCredential(studentSIS);
                 await this.alocateBalance(address);
@@ -25,12 +25,10 @@ class CredentialManagementService{
         const walletGenerate = ethers.Wallet.createRandom();
         const address = walletGenerate.address;
         const menomic = walletGenerate.mnemonic.phrase;
-        const publicKey = walletGenerate.publicKey;
 
         return {
             address,
-            menomic,
-            publicKey
+            menomic
         }
     }
 
@@ -43,6 +41,10 @@ class CredentialManagementService{
         });
 
         await tx.wait();
+    }
+
+    async getAddressBySIS(sisCode) {
+
     }
 }
 

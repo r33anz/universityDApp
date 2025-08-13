@@ -1,7 +1,9 @@
 import NotificationService from "../../services/NotificationService.js";
 import IpfsService from "../../services/IpfsService.js";
-import CredentialManagement from "../../../infraestructure/blockchain/contracts/CredentialManagement.js";
 import MergeFileService from "../../services/MergeFileService.js";
+import KardexError from "../../../interface/error/kardexErrors.js";
+import ContractError from "../../../interface/error/contractErrors.js";
+import NFTService from "../../services/NFTService.js";
 
 class UseCaseKardexRequest{
 
@@ -22,10 +24,11 @@ class UseCaseKardexRequest{
     async uploadingKardexToIPFS(pdfList) {
         try {
             if (!Array.isArray(pdfList) || pdfList.length === 0) {
-                throw new Error('Datos de PDF incompletos');
+                throw KardexError.fileUploadRequired({
+                    details: "La lista de PDFs está vacía"
+                });
             }
 
-            const sisCode = pdfList[0].sisCode;
             const mergefiles = await MergeFileService.processFiles(pdfList);
             const ipfsResult = await IpfsService.uploadMultiplePdfs(
                 mergefiles.map(f => ({
@@ -33,19 +36,45 @@ class UseCaseKardexRequest{
                   filename: f.mergedFilename,
                   path: f.path
                 }))
-              );
+            );
+              
+            const sisCode = pdfList[0].sisCode;
+            const mfsCID = ipfsResult.dirCid;
+            try {
+                const { success, tokenURI } = await NFTService.manageNFT(sisCode, mfsCID);
 
-            //implementar contrato
+                if (!success) {
+                    throw KardexError.kardexProcessingError({
+                        details: "No se pudo procesar el NFT"
+                    });
+                }
 
-            return {
-                success: true,
-                //files: ipfsResult.files,
-                //dirCid: ipfsResult.dirCid,
-                //link: `http://localhost:8080/ipfs/${ipfsResult.dirCid}`
-            };
+                console.log(`NFT creado exitosamente para el estudiante: ${sisCode} con URI ${tokenURI}`);
+                return {
+                    success: true
+                };
+            } catch (error) {
+                if (error.isContractError) {
+                    throw KardexError.contractError(
+                        `Error en el contrato inteligente: ${error.message}`,
+                        error.details,
+                        error.errorCode
+                    );
+                }
+                throw error;
+            }
+
         } catch (error) {
             console.error('Error al subir PDF en el caso de uso:', error);
-            //throw new Error(`Error al subir PDF: ${error.message}`);
+            
+            if (error instanceof KardexError || error instanceof ContractError) {
+                throw error; 
+            }
+            
+            throw KardexError.kardexProcessingError({
+                originalError: error.message,
+                stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+            });
         }
     }
 }

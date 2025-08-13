@@ -1,6 +1,7 @@
 import ipfsConnection from "../../infraestructure/ipfs/ipfsConnection.js";
 import { Blob } from 'buffer';
 import KardexError from "../../interface/error/kardexErrors.js";
+import envConfig from "../../envConfig.js";
 
 class IPFSService{
     async uploadMultiplePdfs(pdfs) {
@@ -52,7 +53,7 @@ class IPFSService{
             return {
                 success: true,
                 dirCid: rootCid,
-                ipfsLink: `http://localhost:8080/ipfs/${rootCid}`
+                ipfsLink: `${envConfig.IPFS_GATEWAY}${rootCid}`
             };
         }catch (error) {
                 console.error('Error en IPFSService', error);
@@ -127,6 +128,30 @@ class IPFSService{
                     errorDetails: error.message
                 },
                 "IPFS_COPY_ERROR"
+            );
+        }
+    }
+
+    async metadataJSON(metadata) {
+        try {
+            if (!ipfsConnection.client) {
+                throw KardexError.internal(
+                    "La conexión IPFS no está inicializada",
+                    null,
+                    "IPFS_CONNECTION_ERROR"
+                );
+            }
+
+            const jsonBlob = new Blob([JSON.stringify(metadata)], { type: 'application/json' });
+            const cid  = await ipfsConnection.uploadFile(jsonBlob);
+
+            return cid;
+        } catch (error) {
+            console.error('Error al subir metadata JSON a IPFS:', error);
+            throw KardexError.internal(
+                "Error al subir metadata JSON a IPFS",
+                { errorDetails: error.message },
+                "IPFS_METADATA_ERROR"
             );
         }
     }
