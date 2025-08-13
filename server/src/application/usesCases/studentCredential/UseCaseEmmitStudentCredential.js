@@ -1,6 +1,6 @@
 import StudentService from "../../services/StudentService.js"
-import CredentialManagement from "../../../infraestructure/blockchain/contracts/CredentialManagement.js"
 import StudentSerror from "../../../interface/error/studentErrors.js";
+import CredentilaManagementService from "../../services/CredentilaManagementService.js";
 
 class UseCaseEmmitStudentCredential{
 
@@ -23,7 +23,7 @@ class UseCaseEmmitStudentCredential{
         
         try {
             const {mnemonic} = 
-                await CredentialManagement.emmitCredential(student.codSIS);
+                await CredentilaManagementService.emmitCredential(student.codSIS);
             return {
                 id: student.id,
                 codSIS: student.codSIS,

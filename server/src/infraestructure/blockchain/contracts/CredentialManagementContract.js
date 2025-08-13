@@ -2,7 +2,6 @@ import wallet from "../blockchainConnetion.js";
 import abiCredentialManagement from "../abi/abiCredentialManagement.js";
 import { ethers } from "ethers";
 import envConfig from "../../../envConfig.js";
-import StudentService from "../../../application/services/StudentService.js";
 import ContractError from "../../../interface/error/contractErrors.js";
 
 class CredentialManagement {
@@ -10,13 +9,9 @@ class CredentialManagement {
         this.contractAddress = envConfig.CONTRACT_ADDRESS_STUDENT_MANAGEMENT_CREDENTIALS || "";
         this.ABI = abiCredentialManagement
         this.contract = new ethers.Contract(this.contractAddress, this.ABI, wallet);
-        this.studentService = StudentService;
     }
 
-    async emmitCredential(studentSIS) {
-        const {address, menomic, publicKey } 
-            = this.#generateCredentials();
-        
+    async emmitCredential(studentSIS,address, publicKey) {
             try {
                 const tx = await this.contract.emmitCredential(studentSIS, address, publicKey);
                 const receipt = await tx.wait();
@@ -29,11 +24,8 @@ class CredentialManagement {
                     );
                 }
 
-                this.studentService.assignedCredential(studentSIS);
-                await this.alocateBalance(address);
-
                 console.log(`Credencial emitida para el estudiante ${studentSIS}`);
-                return {mnemonic: menomic};
+                return true;
             } catch (error) {
                 if (error.code === 'CALL_EXCEPTION') {
                     throw new ContractError(
@@ -113,30 +105,6 @@ class CredentialManagement {
                     { originalError: error.message }
                 );
             }
-        }
-    }
-
-    async alocateBalance(studentAddress) {
-        const amountInEther = "0.01"
-
-        const tx = await wallet.sendTransaction({
-            to: studentAddress,
-            value: ethers.parseEther(amountInEther)
-        });
-
-        await tx.wait();
-    }
-
-    #generateCredentials() {
-        const walletGenerate = ethers.Wallet.createRandom();
-        const address = walletGenerate.address;
-        const menomic = walletGenerate.mnemonic.phrase;
-        const publicKey = walletGenerate.publicKey;
-
-        return {
-            address,
-            menomic,
-            publicKey
         }
     }
 }
