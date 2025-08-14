@@ -1,8 +1,8 @@
-import wallet from "../blockchainConnetion";
-import abiNFT from "../abi/abiNFT";
+import wallet from "../blockchainConnetion.js";
+import abiNFT from "../abi/abiNFT.js";
 import { ethers } from "ethers";
-import envConfig from "../../../envConfig";
-import ContractError from "../../../interface/error/contractErrors";
+import envConfig from "../../../envConfig.js";
+import ContractError from "../../../interface/error/contractErrors.js";
 
 class NFTContract {
     constructor() {

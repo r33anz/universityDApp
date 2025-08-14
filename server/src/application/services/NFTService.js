@@ -1,8 +1,8 @@
-import NFTContract from "../../infraestructure/blockchain/contracts/NFTContract";
-import CredentialManagement from "../../infraestructure/blockchain/contracts/CredentialManagementContract";
-import { createURINFTTemplate } from "../../interface/uriNFTtemplate/URINFTTemplate";
-import IpfsService from "./IpfsService";
-import envConfig from "../../envConfig";
+import NFTContract from "../../infraestructure/blockchain/contracts/NFTContract.js";
+import CredentialManagement from "../../infraestructure/blockchain/contracts/CredentialManagementContract.js";
+import { createURINFTTemplate } from "../../interface/uriNFTtemplate/URINFTTemplate.js";
+import IpfsService from "./IpfsService.js";
+import envConfig from "../../envConfig.js";
 
 class NFTService{
     async manageNFT(siscode, mfsCID) {

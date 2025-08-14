@@ -6,7 +6,7 @@ import ContractError from "../../../interface/error/contractErrors.js";
 
 class CredentialManagement {
     constructor() {
-        this.contractAddress = envConfig.CONTRACT_ADDRESS_STUDENT_MANAGEMENT_CREDENTIALS || "";
+        this.contractAddress = envConfig.CONTRACT_ADDRESS_PROXY_MANAGEMENT_CREDENTIAL || "";
         this.ABI = abiCredentialManagement
         this.contract = new ethers.Contract(this.contractAddress, this.ABI, wallet);
     }
