@@ -1,32 +1,23 @@
-const { ethers } = require('hardhat');
+const { ethers, upgrades } = require('hardhat'); 
 
 async function main() {
-    const Implementation = await ethers.getContractFactory("CredentialStudentManagement");
-    const implementation = await Implementation.deploy();
+    const [deployer] = await ethers.getSigners();
+    console.log("Deploying with account:", deployer.address);
+
+    const CredentialStudentManagement = await ethers.getContractFactory("CredentialStudentManagement");
+    const implementation = await CredentialStudentManagement.deploy();
     await implementation.waitForDeployment();
-    const implementationAddress = await implementation.getAddress();
-    console.log("Implementation contract address:", implementationAddress);
-    console.log("Implementación desplegada en:", implementation.target);
+    console.log("Implementation address:", await implementation.getAddress());
 
-    const Proxy = await ethers.getContractFactory("CredentialProxy");
-    const proxy = await Proxy.deploy(implementationAddress);
+    const proxy = await upgrades.deployProxy(CredentialStudentManagement, [deployer.address], { 
+        kind: 'uups' // Especifica UUPS
+    });
     await proxy.waitForDeployment();
-    const proxyAddress = await proxy.getAddress();  
-    console.log("Proxy contract address:", proxyAddress);
-    console.log("Proxy desplegado en:", proxy.target);
+    console.log("Proxy address:", await proxy.getAddress());
 
-    const proxyAsImpl = await ethers.getContractAt("CredentialStudentManagement", proxy.target);
-
-    // Verificar admin
-    const admin = await proxyAsImpl.getAdmin();
-    console.log("Admin configurado:", admin);
-
-    console.log("✅ Deploy inicial completado");
 }
 
 main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
-  });
-
-
+});

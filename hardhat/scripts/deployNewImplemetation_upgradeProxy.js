@@ -1,33 +1,28 @@
-const { ethers } = require("hardhat");
+const { ethers, upgrades } = require('hardhat');
 
 async function main() {
-  const [admin] = await ethers.getSigners();
-  console.log("Usando admin:", admin.address);
+    
+    const [deployer] = await ethers.getSigners();
+    console.log("Upgrading with account:", deployer.address);
 
-  // Dirección del proxy ya desplegado
-  const PROXY_ADDRESS = "0xTuDireccionDeProxy";
+    const proxyAddress = "0xTuDirecciónDelProxy"; // Replace the address of ypur proxy
 
-  const NewImplementation = await ethers.getContractFactory("CredentialStudentManagement");
-  const newImplementation = await NewImplementation.deploy();
-  await newImplementation.waitForDeployment();
-  console.log("Nueva implementación desplegada en:", newImplementation.target);
+    const CredentialStudentManagementV2 = await ethers.getContractFactory("CredentialStudentManagementV2");
 
-  const proxyContract = await ethers.getContractAt("CredentialProxy", PROXY_ADDRESS);
+    console.log("Upgrading proxy to new implementation...");
+    const upgradedProxy = await upgrades.upgradeProxy(proxyAddress, CredentialStudentManagementV2, {
+        kind: 'uups' 
+    });
 
-  const tx = await proxyContract.connect(admin).upgrade(newImplementation.target);
-  await tx.wait();
-  console.log("Proxy actualizado a nueva implementación");
+    await upgradedProxy.waitForDeployment();
+    console.log("Proxy upgraded successfully!");
+    console.log("Proxy address (unchanged):", await upgradedProxy.getAddress());
 
-  const proxyAsImpl = await ethers.getContractAt("CredentialStudentManagement", PROXY_ADDRESS);
-  const adminAddress = await proxyAsImpl.getAdmin();
-  console.log("Admin sigue siendo:", adminAddress);
-
-  console.log("✅ Upgrade completado");
+    const implementationAddress = await upgrades.erc1967.getImplementationAddress(proxyAddress);
+    console.log("New implementation address:", implementationAddress);
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+main().catch((error) => {
+    console.error("Error during upgrade:", error);
+    process.exitCode = 1;
+});
