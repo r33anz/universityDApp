@@ -2,9 +2,9 @@ import StudentService from "../../services/StudentService.js"
 import StudentSerror from "../../../interface/error/studentErrors.js";
 import CredentilaManagementService from "../../services/CredentilaManagementService.js";
 
-class UseCaseEmmitStudentCredential{
+class UseCaseEmitStudentCredential{
 
-    async emmitCredential(sisCode){
+    async emitCredential(sisCode){
         const student = await StudentService.veryfyStudentInDB(sisCode);
         if(!student){
             throw StudentSerror.notFound(
@@ -23,8 +23,9 @@ class UseCaseEmmitStudentCredential{
         
         try {
             const {mnemonic} = 
-                await CredentilaManagementService.emmitCredential(student.codSIS);
-            return {
+                await CredentilaManagementService.emitCredential(student.codSIS);
+                
+                return {
                 id: student.id,
                 codSIS: student.codSIS,
                 mnemonic: mnemonic
@@ -40,4 +41,4 @@ class UseCaseEmmitStudentCredential{
     }
 }
 
-export default new UseCaseEmmitStudentCredential();
+export default new UseCaseEmitStudentCredential();

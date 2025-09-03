@@ -11,9 +11,9 @@ class CredentialManagement {
         this.contract = new ethers.Contract(this.contractAddress, this.ABI, wallet);
     }
 
-    async emmitCredential(studentSIS,address) {
+    async emitCredential(studentSIS,address) {
             try {
-                const tx = await this.contract.emmitCredential(studentSIS, address);
+                const tx = await this.contract.emitCredential(studentSIS, address);
                 const receipt = await tx.wait();
 
                 if (receipt.status === 0) {
@@ -110,7 +110,7 @@ class CredentialManagement {
     
     async getAddress(sisCode){
         try{
-            const address = await this.contract.getAddress(sisCode);
+            const address = await this.contract.getStudentAddressBySISCode(sisCode);
             return address;
         }catch(error) {
             if (error.code === 'CALL_EXCEPTION') {
