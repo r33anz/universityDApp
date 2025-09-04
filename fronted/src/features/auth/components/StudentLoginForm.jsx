@@ -1,7 +1,7 @@
 import React,{useState} from "react";
 import { Button } from "../../../shared/components/Button";
-import {Input} from "../../../shared/components/Input";
-import {Label} from "../../../shared/components/Label";
+import { Input } from "../../../shared/components/Input";
+import { Label } from "../../../shared/components/Label";
 import SeedPhraseModal  from "../../wallet/SeedPhraseModal";
 import { loginStudent } from "../service/studentService";
 import { useToastContext } from "../../../shared/providers/ToastProvider";
@@ -15,31 +15,31 @@ const  StudentLoginForm = () => {
     const toast = useToastContext()
 
     const handleSubmit = async (e) => {
-        try {
-            e.preventDefault()
-            setLoading(true)
-            const credential = {SISCode:codigoSIS};
-            const response = await loginStudent(credential);
-            const seedPhrase = response.mnemonic 
-            setSeedPhrase(seedPhrase)
-            setShowSeedPhrase(true)
-        } catch (error) {
-            if (error.response?.data) {
-                const apiError = new ApiError(
-                    error.response.data.message,
-                    error.response.data.errorCode,
-                    error.response.data.details
-                );
+      try {
+        e.preventDefault()
+        setLoading(true)
+        const credential = {SISCode:codigoSIS};
+        const response = await loginStudent(credential);
+        const seedPhrase = response.mnemonic 
+        setSeedPhrase(seedPhrase)
+        setShowSeedPhrase(true)
+      }catch (error) {
+        if (error.response?.data) {
+          const apiError = new ApiError(
+            error.response.data.message,
+            error.response.data.errorCode,
+            error.response.data.details
+          );
 
-                toast.error(apiError.getStatusErrorMessage())
-            } else if (error instanceof ApiError || error.name === "ApiError") {
-                toast.error(error.getStatusErrorMessage())
-            } else{
-                toast.error("Ocurrió un error inesperado")
-            }
-        } finally {
-            setLoading(false)
+          toast.error(apiError.getStatusErrorMessage())
+        } else if (error instanceof ApiError || error.name === "ApiError") {
+            toast.error(error.getStatusErrorMessage())
+        } else{
+            toast.error("Ocurrió un error inesperado")
         }
+      }finally {
+        setLoading(false)
+      }
     }
   
     return (
@@ -73,7 +73,7 @@ const  StudentLoginForm = () => {
             isOpen={showSeedPhrase} 
             onClose={() => setShowSeedPhrase(false)}
             seedPhrase={seedPhrase}
-            />
+        />
       </>
     )
   }
