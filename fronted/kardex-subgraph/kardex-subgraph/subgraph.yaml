@@ -1,0 +1,25 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: KardexRegistry
+    network: chapel
+    source:
+      address: "0xd1bd72d7292430c1dc1481f676739fa697a0a50c"
+      abi: KardexRegistry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Upgraded
+      abis:
+        - name: KardexRegistry
+          file: ./abis/KardexRegistry.json
+      eventHandlers:
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/kardex-registry.ts

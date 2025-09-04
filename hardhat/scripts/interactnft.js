@@ -1,4 +1,8 @@
-const abiNFT = [
+const { ethers } = require("hardhat");
+
+const PROXY_ADDRESS = "0x07F751090e3f279CC7CEd7306C1B0d6949cc9d64";
+
+const ABI = [
     {
       "inputs": [],
       "stateMutability": "nonpayable",
@@ -859,4 +863,46 @@ const abiNFT = [
     }
   ]
 
-export default abiNFT;
+async function main() {
+    
+    
+    const BSC_TESTNET_RPC = "https://data-seed-prebsc-1-s1.binance.org:8545/";
+    const provider = new ethers.JsonRpcProvider(BSC_TESTNET_RPC);
+
+    // Coloca tu clave privada de la cuenta de minteo en testnet
+    const PRIVATE_KEY = "267358dbffd125947c556a37a5c1ab66d3e256fc8e47cc845d2ecbd2d1f930b8"; 
+    const signer = new ethers.Wallet(PRIVATE_KEY, provider);
+
+    const contract = new ethers.Contract(PROXY_ADDRESS, ABI, signer);
+
+    const studentAddress = "0x47cDCA32A0e3603E5d67a5c452D701C142347E8f";
+    const studentId = "20250021";
+    const ipfsCid = "QmY2FTJadStAcmoNHghrH1P6gBigzAdP3vDByijfCpGvew"; // ejemplo de CID
+    const metadataUri = "ipfs://QmPotFrPAiTdNqwXLny8LT2RNKFYgdtwvry9hvH2arwxjK";
+
+    // Simulación de mint
+    const tx = await contract.mintStudentKardex(
+        studentAddress,
+        studentId,
+        ipfsCid,
+        metadataUri
+    );
+
+    console.log("Transacción enviada, hash:", tx.hash);
+
+    // Esperar a que se confirme
+    const receipt = await tx.wait();
+    console.log("NFT minteado! Bloque:", receipt.blockNumber);
+
+    // Comprobar
+    const tieneKardex = await contract.hasKardex(studentAddress);
+    console.log("Tiene kardex?", tieneKardex);
+
+    const kardex = await contract.getStudentKardex(studentAddress);
+    console.log("Kardex:", kardex);
+}
+
+main().catch((error) => {
+    console.error("Error:", error);
+    process.exit(1);
+});

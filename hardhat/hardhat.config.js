@@ -1,5 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("@openzeppelin/hardhat-upgrades");
+//require("@nomiclabs/hardhat-etherscan");
+
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -14,9 +16,16 @@ module.exports = {
     },
      localhost: {
       url: "http://127.0.0.1:8545"
+    },
+    bsc: {
+      url: "https://bsc-dataseed.binance.org/",
+      accounts: [process.env.PRIVATE_KEY],
     }
   },
   etherscan: {
-    apiKey: process.env.BSCSCAN_API_KEY, 
+    apiKey: {
+       bscTestnet: process.env.BSCSCAN_API_KEY,
+      bsc: process.env.BSCSCAN_API_KEY,
+    }
   },
 };

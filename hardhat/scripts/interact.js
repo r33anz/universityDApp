@@ -1,4 +1,8 @@
-const abiCredentialManagement = [
+const { ethers } = require("hardhat");
+
+const PROXY_ADDRESS = "0xD1BD72d7292430c1dc1481f676739Fa697a0A50c";
+
+const ABI = [
     {
       "inputs": [
         {
@@ -446,6 +450,67 @@ const abiCredentialManagement = [
       "stateMutability": "view",
       "type": "function"
     }
-  ]
+  ];
 
-export default abiCredentialManagement;
+async function main() {
+    console.log("🔍 Diagnosticando problema de storage...\n");
+    
+    const provider = ethers.provider;
+    const contract = new ethers.Contract(PROXY_ADDRESS, ABI, provider);
+    
+    const sisCode = "20190010";
+    
+    console.log(`Proxy Address: ${PROXY_ADDRESS}`);
+    console.log(`SIS Code: ${sisCode}\n`);
+    
+    // 1. Consulta directa al struct students
+    console.log("📊 Consultando struct students[sisCode]:");
+    const student = await contract.students(sisCode);
+    console.log(`- codSIS: "${student.codSIS}"`);
+    console.log(`- walletAddress: ${student.walletAddress}`);
+    console.log(`- passwordHash: ${student.passwordHash}`);
+    console.log(`- ipfsHash: "${student.ipfsHash}"`);
+    console.log(`- issuedAt: ${student.issuedAt.toString()}`);
+    
+    // 2. Consulta a través de getAddress
+    console.log("\n🔍 Consultando getAddress(sisCode):");
+    const addressFromFunction = await contract.getStudentAddressBySISCode(sisCode);
+    console.log(`getAddress result: ${addressFromFunction}`);
+    
+    // 3. Comparación
+    console.log("\n📊 Análisis:");
+    console.log(`Wallet en struct: ${student.walletAddress}`);
+    console.log(`Resultado getAddress: ${addressFromFunction}`);
+    console.log(`¿Son iguales?: ${student.walletAddress.toLowerCase() === addressFromFunction.toLowerCase()}`);
+    
+    if (addressFromFunction === PROXY_ADDRESS) {
+        console.log("\n❌ PROBLEMA IDENTIFICADO:");
+        console.log("getAddress está retornando la dirección del proxy en lugar de la wallet del estudiante");
+        console.log("Esto indica un problema grave de storage slots o implementación del proxy");
+    }
+    
+    // 4. Verificar si el problema afecta a otros estudiantes
+    console.log("\n🔄 Probando con otros SIS codes posibles:");
+    const testSisCodes = ["20190010"];
+    
+    for (const testSis of testSisCodes) {
+        try {
+            const testStudent = await contract.students(testSis);
+            if (testStudent.codSIS && testStudent.codSIS !== "") {
+                const testAddress = await contract.getStudentAddressBySISCode(testSis);
+                console.log(`SIS ${testSis}:`);
+                console.log(`  Struct wallet: ${testStudent.walletAddress}`);
+                console.log(`  getAddress: ${testAddress}`);
+                console.log(`  Problema: ${testAddress === PROXY_ADDRESS ? "SÍ" : "NO"}`);
+            }
+        } catch (error) {
+            // SIS no existe, continuar
+        }
+    }
+  
+}
+
+main().catch((error) => {
+    console.error("Error:", error);
+    process.exit(1);
+});

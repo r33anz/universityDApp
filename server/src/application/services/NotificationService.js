@@ -134,6 +134,22 @@ class NotificationService{
         }
     }
 
+    async studentsAskKardex(sisCode){
+  
+      try {
+        const result = await notification.findOne({
+          where: {
+            from: sisCode,
+            status: STATUS_ENUM.IN_PROCESS
+          }
+        });
+
+        return result ? true : false;
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
     async updateNotificatioToAttended(sisCode){
       try {
         if (!sisCode) {

@@ -1,4 +1,4 @@
-import UseCaseEmmitStudentCredential from "../../application/usesCases/studentCredential/UseCaseEmmitStudentCredential.js";
+import UseCaseEmitStudentCredential from "../../application/usesCases/studentCredential/UseCaseEmitStudentCredential.js";
 import StudentSerror from "../error/studentErrors.js";
 
 class StudentController{
@@ -9,7 +9,7 @@ class StudentController{
                 throw new StudentSerror("El código SIS es requerido", 400)
               }
             const student =    
-                await UseCaseEmmitStudentCredential.emmitCredential(SISCode);
+                await UseCaseEmitStudentCredential.emitCredential(SISCode);
             res.status(200).json(student);
         } catch (error) {
 

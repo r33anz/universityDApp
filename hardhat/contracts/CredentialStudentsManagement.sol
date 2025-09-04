@@ -65,8 +65,8 @@ contract CredentialStudentManagement is Initializable,UUPSUpgradeable,OwnableUpg
 
     function getStudentAddressBySISCode(string calldata sisCode) external view returns(address) {
         require(bytes(sisCode).length > 0, "El codigo SIS no puede estar vacio");
-        require(bytes(students[sisCode].codSIS).length > 0, "El estudiante no existe");
-        return students[sisCode].walletAddress;
+    require(bytes(students[sisCode].codSIS).length > 0, "El estudiante no existe");
+    return students[sisCode].walletAddress;
     }
     
     function getStudentPassword(string calldata sisCode) external view returns(bytes32) {
