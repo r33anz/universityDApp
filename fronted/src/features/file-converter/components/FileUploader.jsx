@@ -4,8 +4,20 @@ import { UploadIcon } from "../../../shared/components/Icons";
 export function FileUploader({ onFileUpload }) {
     const handleChange = (e) => {
       const file = e.target.files[0];
-      if (file && file.type === "application/json") {
+      if (!file) return;
+      
+      const isValid = file.type === "application/json" || 
+                      file.name.toLowerCase().endsWith('.json');
+      
+      if (isValid) {
         onFileUpload(file);
+      } else {
+        e.target.value = '';
+        const error = new Error("FORMATO_INVALIDO");
+        if (file.size === 0) {
+          error.message = "ARCHIVO_VACIO";
+        }
+        onFileUpload(error);
       }
     };
   
