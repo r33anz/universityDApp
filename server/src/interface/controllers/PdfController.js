@@ -50,10 +50,16 @@ class PdfController{
             }
  
           const result = await UseCaseKardexRequest.uploadingKardexToIPFS(files);
-          
-          return res.status(201).json({
+          if (result){
+            return res.status(201).json({
             success: true
           });
+          }else{
+            return res.status(401).json({
+            success: false
+          });
+          }
+          
             
         } catch (error) {
           console.error('Error en PDF Controller:', error);

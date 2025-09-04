@@ -12,14 +12,22 @@ class NFTContract {
     }
 
     async mintStudentKardex(studentAddress,sisCode,mfsCid,metadataURI){
+       
+        if (!ethers.isAddress(studentAddress)) throw new Error("Dirección estudiante inválida");
+        if (!sisCode || sisCode.length === 0) throw new Error("Student ID vacío");
+        if (!metadataURI || metadataURI.length === 0) throw new Error("Metadata URI vacío");
+        if (!mfsCid || mfsCid.length === 0) throw new Error("IPFS CID vacío");
+        
         try {
-            const tx = await this.contract.mintKardex(
+            const tx = await this.contract.mintStudentKardex(
                 studentAddress,
                 sisCode,
                 mfsCid,
                 metadataURI
             );
+            console.log("TX:", tx);
             const receipt = await tx.wait();
+            console.log("Receipt:", receipt);
 
             if(receipt.status === 0) {
                     throw new ContractError(
@@ -68,7 +76,7 @@ class NFTContract {
 
     async updateProgress(studentAddress,newMfsCid,newMetadataURI) {
         try {
-            const tx = await this.contract.updateProgress(
+            const tx = await this.contract.updateStudentProgress(
                 studentAddress,
                 newMfsCid,
                 newMetadataURI

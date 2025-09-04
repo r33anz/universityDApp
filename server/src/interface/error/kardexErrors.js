@@ -14,6 +14,10 @@ class KardexError extends Error {
     static internal(message, details = null, errorCode = null) {
         return new KardexError(message, 500, details, errorCode)
     }
+
+    static notFound(message, details = null, errorCode = null) {
+        return new KardexError(message, 404, details, errorCode);
+    }
     
     static invalidFileFormat(details = null) {
         return new KardexError(

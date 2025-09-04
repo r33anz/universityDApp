@@ -4,7 +4,7 @@ import KardexError from "../../interface/error/kardexErrors.js";
 import envConfig from "../../envConfig.js";
 
 class IPFSService{
-    async uploadMultiplePdfs(pdfs) {
+    async uploadMultiplePdfs(pdfs, overwrite = false) {
         try {
             if (!ipfsConnection.client) {
                 throw KardexError.internal(
@@ -13,7 +13,7 @@ class IPFSService{
                     "IPFS_CONNECTION_ERROR"
                 );
             }
-            
+
             if (!pdfs || pdfs.length === 0) {
                 throw KardexError.badRequest(
                     "No se proporcionaron archivos para subir",
@@ -23,27 +23,74 @@ class IPFSService{
             }
 
             const results = [];
-            const basePath = `/${pdfs[0].path.split('/')[1]}`; 
-
+            const basePath = `/${pdfs[0].path.split("/")[1]}`; 
             await this.createDirectoryStructure(pdfs);
-            
+
             for (const pdf of pdfs) {
-                if (!pdf.path || !pdf.blob) {
+                if (!pdf.path || !pdf.blob || !pdf.filename) {
                     throw KardexError.badRequest(
-                        "Cada archivo debe tener path y blob definidos",
+                        "Cada archivo debe tener path, blob y filename definidos",
                         { filename: pdf.filename },
                         "INVALID_FILE_DATA"
                     );
                 }
 
-                const { cid } = await ipfsConnection.client.add(pdf.blob);
-                const fullPath = `${pdf.path}${pdf.filename}`;
-                await ipfsConnection.client.files.cp(`/ipfs/${cid}`, fullPath);
+                const filename = overwrite
+                    ? pdf.filename
+                    : `${pdf.filename.replace(".pdf", "")}_${Date.now()}.pdf`;
+                const fullPath = `${pdf.path}${filename}`;
+
+                const { cid } = await ipfsConnection.client.add(pdf.blob, {
+                    cidVersion: 1, 
+                });
+                
+                if (!overwrite) {
+                    try {
+                        await ipfsConnection.client.files.stat(fullPath);
+                        throw KardexError.fileExists(
+                            `El archivo ya existe en IPFS: ${fullPath}`,
+                            { path: fullPath },
+                            "FILE_ALREADY_EXISTS"
+                        );
+                    } catch (error) {
+                        if (!error.message.includes("file does not exist")) {
+                            console.error(`[IPFSService] Error checking file existence: ${error.message}`);
+                            throw error;
+                        }
+                    }
+                } else {
+                    try {
+                        await ipfsConnection.client.files.rm(fullPath, { recursive: true });
+                    } catch (error) {
+                        if (!error.message.includes("file does not exist")) {
+                            console.error(`[IPFSService] Error removing existing file: ${error.message}`);
+                            throw KardexError.ipfsRemoveError(
+                                `Error al eliminar archivo existente en IPFS: ${fullPath}`,
+                                { path: fullPath, errorDetails: error.message },
+                                "IPFS_REMOVE_ERROR"
+                            );
+                        }
+                    }
+                }
+
+                try {
+                    await ipfsConnection.client.files.cp(`/ipfs/${cid}`, fullPath, {
+                        overwrite: true, 
+                        cidVersion: 1, 
+                    });
+                } catch (error) {
+                    console.error(`[IPFSService] Error copying file to MFS: ${error.message}`);
+                    throw KardexError.internal(
+                        `No se pudo copiar el archivo a MFS: ${fullPath}`,
+                        { cid: cid.toString(), fullPath, errorDetails: error.message },
+                        "IPFS_COPY_ERROR"
+                    );
+                }
 
                 results.push({
-                    filename: pdf.filename,
+                    filename,
                     path: fullPath,
-                    cid: cid.toString()
+                    cid: cid.toString(),
                 });
             }
 
@@ -53,27 +100,26 @@ class IPFSService{
             return {
                 success: true,
                 dirCid: rootCid,
-                ipfsLink: `${envConfig.IPFS_GATEWAY}${rootCid}`
+                ipfsLink: `${envConfig.IPFS_GATEWAY}${rootCid}`,
+                files: results,
             };
-        }catch (error) {
-                console.error('Error en IPFSService', error);
-                
-                if (error instanceof KardexError) {
-                    throw error;
-                }
-                
-                throw KardexError.internal(
-                    "Error al subir archivos a IPFS",
-                    {
-                        errorDetails: error.message,
-                        stack: process.env.NODE_ENV === "development" ? error.stack : undefined
-                    },
-                    "IPFS_UPLOAD_ERROR"
-                );
+        } catch (error) {
+            console.error(`[IPFSService] Error in uploadMultiplePdfs: ${error.message}`);
+            if (error instanceof KardexError) {
+                throw error;
+            }
+            throw KardexError.internal(
+                "Error al subir archivos a IPFS",
+                {
+                    errorDetails: error.message,
+                    stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+                },
+                "IPFS_UPLOAD_ERROR"
+            );
         }
     }
 
-      async createDirectoryStructure(pdfs) {
+    async createDirectoryStructure(pdfs) {
         const createdPaths = new Set();
         
         try {

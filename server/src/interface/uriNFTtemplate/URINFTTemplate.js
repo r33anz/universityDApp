@@ -1,13 +1,15 @@
-import envConfig from "../../envConfig"
+import envConfig from "../../envConfig.js"
 
 export function createURINFTTemplate(siscode, mfsCID) {
     const universityName = "Universidad Mayor de San Simon - UMSS"; 
     const issueDate = new Date().toISOString();
-    
+    const cidDefaultImage = envConfig.IPFS_DEFAULT_KARDEX_IMAGE;
+
     return {
         "name": `Kardex Estudiantil-${siscode}`,
         "description": `Kardex académico oficial del estudiante con SIS code ${siscode}, emitido por ${universityName}`,
         "external_url": `${envConfig.IPFS_GATEWAY}${mfsCID}`,
+        "image": `${envConfig.IPFS_GATEWAY}${cidDefaultImage}`,
         "university": universityName,
         "issue_date": issueDate,
         "student_sis_code": siscode,

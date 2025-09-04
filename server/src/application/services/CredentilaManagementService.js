@@ -1,15 +1,16 @@
 import { ethers } from 'ethers';
 import CredentialManagement from '../../infraestructure/blockchain/contracts/CredentialManagementContract.js';
 import StudentService from './StudentService.js';
+import wallet from '../../infraestructure/blockchain/blockchainConnetion.js';
 
 class CredentialManagementService{
 
-    async emmitCredential(studentSIS) {
+    async emitCredential(studentSIS) {
          const {address, menomic } 
             = this.#generateCredentials();
 
         try{
-            const tx = await CredentialManagement.emmitCredential(studentSIS,address);
+            const tx = await CredentialManagement.emitCredential(studentSIS,address);
             if(tx){
                 StudentService.assignedCredential(studentSIS);
                 await this.alocateBalance(address);
@@ -41,10 +42,17 @@ class CredentialManagementService{
         });
 
         await tx.wait();
+        console.log(`Allocated ${amountInEther} ETH to ${studentAddress}`);
     }
 
     async getAddressBySIS(sisCode) {
-
+        try {
+            const address = await CredentialManagement.getAddress(sisCode);
+            return address;
+        } catch (error) {
+            console.error("Error al obtener la dirección por SIS:", error);
+            throw new Error("No se pudo obtener la dirección del estudiante");
+        }
     }
 }
 
