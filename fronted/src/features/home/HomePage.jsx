@@ -1,43 +1,100 @@
-import React from "react"
+import React from "react";
 import { Link } from "react-router-dom";
+import { 
+  EyeIcon, 
+  ShieldIcon, 
+  InfoIcon, 
+  CopyIcon } from "../../shared/components/Icons";
 
-const  HomePage = () => {
-    return (
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-180px)] px-4">
-        <div className="text-center max-w-4xl w-full mb-12">
-          <h1 className="text-4xl font-bold text-[#184494ff] mb-4">Bienvenido a transferKardex</h1>
-          <p className="text-lg text-gray-600 mb-12">
-            Sistema blockchain para la gestión de kardex académico de la Universidad Mayor de San Simón
-          </p>
-        </div>
-  
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full">
-          <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:border-[#184494ff]/20 transition-all">
-            <h2 className="text-2xl font-semibold text-[#184494ff] mb-4">Para Estudiantes</h2>
-            <p className="text-gray-600 mb-6">Accede a tu kardex y gestiona tus documentos académicos de forma segura.</p>
-            <Link
-              to="/estudiante"
-              className="inline-block w-full bg-[#184494ff] text-white py-3 px-6 rounded-lg text-center hover:bg-[#184494ff]/90 transition-colors"
-            >
-              Acceso Estudiantes
-            </Link>
+const HomePage = () => {
+
+  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+  const universityWallet = process.env.REACT_APP_WALLET_ADDRESS;
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const truncateAddress = (address) => {
+    if (!address) return "Dirección no configurada";
+    return address
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-start px-4 py-6"> 
+      <div className="text-center max-w-4xl w-full mb-6"> 
+        <h1 className="text-3xl font-bold text-[#184494ff] mb-2"> 
+          Bienvenido a transferKardex
+        </h1>
+        <p className="text-md text-gray-600 mb-6"> 
+          Sistema blockchain para la gestión de kardex académico
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-1 gap-4 w-full max-w-4xl mb-8"> 
+        
+        <div className="bg-blue-50 p-4 rounded-xl border border-gray-200"> 
+          <div className="flex items-center gap-2 mb-2"> 
+            <div className="p-1 bg-blue-100 rounded-full">
+              <InfoIcon className="text-blue-600 w-4 h-4" /> 
+            </div>
+            <h3 className="font-medium text-blue-800 text-md"> 
+              Wallet Institucional
+            </h3>
           </div>
-  
-          <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:border-[#107e7dff]/20 transition-all">
-            <h2 className="text-2xl font-semibold text-[#184494ff] mb-4">Para Docentes</h2>
-            <p className="text-gray-600 mb-6">
-              Gestiona calificaciones y accede a información académica de tus estudiantes.
-            </p>
-            <Link
-              to="/docentes"
-              className="inline-block w-full bg-[#107e7dff] text-white py-3 px-6 rounded-lg text-center hover:bg-[#107e7dff]/90 transition-colors"
-            >
-              Acceso Docentes
-            </Link>
+          
+          <div className="bg-white p-2 rounded-lg border border-gray-200 mb-2"> 
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-xs break-all" title={universityWallet}>
+                {truncateAddress(universityWallet)}
+              </p>
+              <button 
+                onClick={() => copyToClipboard(universityWallet)}
+                className="text-gray-500 hover:text-blue-600 ml-1 p-1 rounded hover:bg-blue-50"
+              >
+                <CopyIcon className="w-3 h-3" /> {/* Icono más pequeño */}
+              </button>
+            </div>
           </div>
+    
         </div>
       </div>
-    )
-  }
-  
+
+      <div className="grid md:grid-cols-2 gap-4 max-w-4xl w-full"> 
+        <div className="bg-white rounded-xl shadow p-6 border border-gray-100"> 
+          <h2 className="text-xl font-semibold text-[#184494ff] mb-2 flex items-center gap-2"> 
+            <EyeIcon className="w-5 h-5" /> 
+            Estudiantes
+          </h2>
+          <p className="text-sm text-gray-600 mb-4"> 
+            Accede a tu kardex académico de forma segura.
+          </p>
+          <Link
+            to="/estudiante"
+            className="inline-block w-full bg-[#088404] text-white py-2 px-4 rounded-lg text-sm" 
+          >
+            Acceder
+          </Link>
+        </div>
+
+        <div className="bg-white rounded-xl shadow p-6 border border-gray-100"> 
+          <h2 className="text-xl font-semibold text-[#184494ff] mb-2 flex items-center gap-2"> 
+            <ShieldIcon className="w-5 h-5" /> 
+            Administracion
+          </h2>
+          <p className="text-sm text-gray-600 mb-4"> 
+            Gestiona calificaciones de estudiantes.
+          </p>
+          <Link
+            to="/administracion"
+            className="inline-block w-full bg-[#088404] text-white py-2 px-4 rounded-lg text-sm" 
+          >
+            Acceder
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default HomePage;
