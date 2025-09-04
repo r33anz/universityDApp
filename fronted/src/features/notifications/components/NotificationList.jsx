@@ -43,7 +43,6 @@ export function NotificationList() {
 
     return (
         <div className="space-y-4 mx-auto">
-            {/* Filtros */}
             <div className="flex space-x-2 mb-4">
                 {Object.entries(STATUS_FILTERS).map(([key, {value,label}]) => (
                     <button
@@ -51,8 +50,8 @@ export function NotificationList() {
                         onClick={() => handleFilterChange(value)}
                         className={`px-3 py-1 text-sm rounded-full ${
                             statusFilter === value 
-                                ? 'bg-blue-500 text-white' 
-                                : 'bg-gray-200 text-gray-700'
+                                ? 'bg-[#184494ff] text-white' 
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                     >
                         {label}
@@ -62,14 +61,13 @@ export function NotificationList() {
               {hasSelected && (
                   <button
                     onClick={() => setIsModalOpen(true)}
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    className="px-3 py-1 bg-[#088404] text-white rounded-full hover:bg-green-500"
                   >
                     Atender seleccionadas ({selectedNotifications.length})
                   </button>
                 )}
             </div>
             
-            {/* Checkbox para seleccionar todas */}
             {statusFilter !== 'attended' && allSelectable.length > 0 && (
               <div className="flex items-center mb-2">
                 <input
@@ -84,8 +82,6 @@ export function NotificationList() {
               </div>
             )}
 
-
-            {/* Lista de notificaciones */}
             <div className="space-y-4">
               {notifications.length > 0 ? (
                 notifications.map((notification) => (

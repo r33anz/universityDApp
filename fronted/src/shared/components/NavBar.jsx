@@ -21,8 +21,8 @@ export function NavBar() {
                     <Link to="/" className="text-xl text-white hover:text-[#e3b505ff] transition-colors">
                         Inicio
                     </Link>
-                    <Link to="/docentes" className="text-xl text-white hover:text-[#e3b505ff] transition-colors">
-                        Docentes
+                    <Link to="/administracion" className="text-xl text-white hover:text-[#e3b505ff] transition-colors">
+                        Administracion
                     </Link>
                     <Link to="/estudiante" className="text-xl text-white hover:text-[#e3b505ff] transition-colors font-medium">
                         Estudiantes
