@@ -6,7 +6,6 @@ const HomePage = React.lazy(() => import("../features/home/HomePage"));
 const StudentLoginPage = React.lazy(() => import("../features/auth/StudentLoginPaeg"));
 const NotificationPage = React.lazy(()=> import("../features/notifications/NotificationPage"));
 const FileConverterPage = React.lazy(()=> import("../features/file-converter/FileConverterPage"));
-const FilterEventPage = React.lazy(()=> import("../features/filter-event/ContractEventsPage"))
 
 export const routes = [
     {
@@ -20,10 +19,6 @@ export const routes = [
         {
           path: "estudiante",
           element: <StudentLoginPage />,
-        },
-        {
-          path: "eventos",
-          element: <FilterEventPage />,
         }
       ],
     },

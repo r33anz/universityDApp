@@ -27,9 +27,6 @@ export function NavBar() {
                     <Link to="/estudiante" className="text-xl text-white hover:text-[#e3b505ff] transition-colors font-medium">
                         Estudiantes
                     </Link>
-                    <Link to="/eventos" className="text-xl text-white hover:text-[#e3b505ff] transition-colors font-medium">
-                        Eventos
-                    </Link>
                 </nav>
                 <div className="md:hidden">
                     <Button variant="ghost" size="sm">
