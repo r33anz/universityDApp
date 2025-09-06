@@ -8,14 +8,17 @@ export function NavBar() {
         <header className="bg-[#184494ff] text-white py-5 px-7 shadow-md">
             <div className="container mx-auto flex justify-between items-center">
                 <div className="flex items-center space-x-3 cursor-pointer">
-                    <img
-                     src={logo} 
-                     alt="Logo UMSS" 
-                     className="h-16 w-auto" />
+                    <Link to="/">
+                        <img
+                            src={logo} 
+                            alt="Logo UMSS" 
+                            className="h-16 w-auto"
+                        />
+                    </Link>
                     
-                    <div className="text-3xl font-bold">
+                    <Link to="/" className="text-3xl font-bold">
                         transferKardex
-                    </div>
+                    </Link>
                 </div>
                 <nav className="hidden md:flex space-x-6">
                     <Link to="/" className="text-xl text-white hover:text-[#e3b505ff] transition-colors">

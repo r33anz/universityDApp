@@ -181,3 +181,20 @@ export const EyeIcon = (props) => (
     );
   }
   
+  export const NotificationsIcon = (props) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M10 4a2 2 0 0 0-2 2v1.5c0 2.4-1.1 4.6-2.9 6.1-.4.4-.6.9-.6 1.4 0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2 0-.5-.2-1-.6-1.4-1.8-1.5-2.9-3.7-2.9-6.1V6a2 2 0 0 0-2-2z" />
+      <path d="M9 18v.5c0 .8.7 1.5 1.5 1.5h3c.8 0 1.5-.7 1.5-1.5V18" />
+    </svg>
+  );
