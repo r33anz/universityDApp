@@ -12,7 +12,6 @@ class NFTContract {
     }
 
     async mintStudentKardex(studentAddress,sisCode,mfsCid,metadataURI){
-       
         if (!ethers.isAddress(studentAddress)) throw new Error("Dirección estudiante inválida");
         if (!sisCode || sisCode.length === 0) throw new Error("Student ID vacío");
         if (!metadataURI || metadataURI.length === 0) throw new Error("Metadata URI vacío");
@@ -36,8 +35,6 @@ class NFTContract {
                         { transactionHash: receipt.transactionHash }
                     );
             }
-
-            console.log(`NFT minted for student ${sisCode}`);
             return true;
         } catch (error) {
             if (error.code === 'CALL_EXCEPTION') {

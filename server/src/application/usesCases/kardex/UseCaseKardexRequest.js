@@ -5,8 +5,6 @@ import KardexError from "../../../interface/error/kardexErrors.js";
 import ContractError from "../../../interface/error/contractErrors.js";
 import CredentialManagement from "../../../infraestructure/blockchain/contracts/CredentialManagementContract.js";
 import NFTService from "../../services/NFTService.js";
-import NFTContract from "../../../infraestructure/blockchain/contracts/NFTContract.js";
-
 class UseCaseKardexRequest{
 
     async listeningResquest(codSIS,timeRequested){
@@ -33,7 +31,7 @@ class UseCaseKardexRequest{
 
             const sisCode = pdfList[0].sisCode;
             const address = CredentialManagement.getAddress(sisCode);
-            const hasExistingKardex = await NFTContract.hasKardex(address);
+            const hasExistingKardex = await NFTService.hasKardex(address);
             const mergefiles = await MergeFileService.processFiles(pdfList);
 
             const ipfsResult = await IpfsService.uploadMultiplePdfs(
@@ -55,20 +53,21 @@ class UseCaseKardexRequest{
                         details: "No se pudo procesar el NFT",
                     });
                 }
+                NotificationService.updateNotificatioToAttended(sisCode);
                 console.log(`NFT creado/actualizado exitosamente para el estudiante: ${sisCode}`);
                 return {
                     success: true
                 };
-        } catch (error) {
-            if (error.isContractError) {
-                throw KardexError.contractError(
-                    `Error en el contrato inteligente: ${error.message}`,
-                    error.details,
-                    error.errorCode
-                );
-            }
-            throw error;
-        }
+            } catch (error) {
+                if (error.isContractError) {
+                    throw KardexError.contractError(
+                        `Error en el contrato inteligente: ${error.message}`,
+                        error.details,
+                        error.errorCode
+                    );
+                }   
+                throw error;
+            }  
 
         } catch (error) {
             console.error('Error al subir PDF en el caso de uso:', error);

@@ -32,6 +32,15 @@ class NFTService{
             throw new Error(`Failed to manage NFT: ${error.message}`);
         }
     }
+
+    async hasKardex (studentAddress){
+        try {
+            return await NFTContract.hasKardex(studentAddress);
+        } catch (error) {
+            console.error("Error checking if student has kardex:", error);
+            throw new Error(`Failed to check kardex: ${error.message}`);
+        }   
+    }
 }
 
 export default new NFTService();
