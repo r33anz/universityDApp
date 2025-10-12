@@ -3,7 +3,7 @@ import { NotificationList } from "./components/NotificationList";
 
 const NotificationPage = () => {
     return (
-        <div className="p-8">
+        <div className="py-8">
           <NotificationList />
         </div>
       );
