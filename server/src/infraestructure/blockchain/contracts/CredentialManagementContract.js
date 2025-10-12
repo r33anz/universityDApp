@@ -24,7 +24,6 @@ class CredentialManagement {
                     );
                 }
 
-                console.log(`Credencial emitida para el estudiante ${studentSIS}`);
                 return true;
             } catch (error) {
                 if (error.code === 'CALL_EXCEPTION') {
