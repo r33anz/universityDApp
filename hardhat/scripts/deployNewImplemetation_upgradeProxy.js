@@ -5,7 +5,8 @@ async function main() {
     const [deployer] = await ethers.getSigners();
     console.log("Upgrading with account:", deployer.address);
 
-    const proxyAddress = "0xTuDirecciónDelProxy"; // Replace the address of ypur proxy
+    // Dirección del proxy desplegado previamente
+    const proxyAddress = "0xD1BD72d7292430c1dc1481f676739Fa697a0A50c"; 
 
     const CredentialStudentManagementV2 = await ethers.getContractFactory("CredentialStudentManagementV2");
 

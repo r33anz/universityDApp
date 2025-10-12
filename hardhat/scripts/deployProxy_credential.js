@@ -10,7 +10,7 @@ async function main() {
     console.log("Implementation address:", await implementation.getAddress());
 
     const proxy = await upgrades.deployProxy(CredentialStudentManagement, [deployer.address], { 
-        kind: 'uups' // Especifica UUPS
+        kind: 'uups' 
     });
     await proxy.waitForDeployment();
     console.log("Proxy address:", await proxy.getAddress());
