@@ -137,6 +137,54 @@ class CredentialManagement {
             }
         }
     }
+
+    async markKardexAsDelivered(sisCode) {
+        try {
+            const tx = await this.contract.markKardexAsDelivered(sisCode);
+            const receipt = await tx.wait();
+            if (receipt.status === 0) {
+                throw new ContractError(
+                    "Transacción revertida",
+                    "TX_REVERTED",
+                    { transactionHash: receipt.transactionHash }
+                );
+            }
+            return true;
+        } catch (error) {
+            if (error.code === 'CALL_EXCEPTION') {
+                throw new ContractError(
+                    "Error en la llamada al contrato",
+                    "CALL_EXCEPTION",
+                    {
+                        reason: error.reason,
+                        method: error.method,
+                        args: error.args
+                    }
+                );
+            } else if (error.code === 'INSUFFICIENT_FUNDS') {
+                throw new ContractError(
+                    "Fondos insuficientes para la transacción",
+                    "INSUFFICIENT_FUNDS",
+                    { requiredGas: error.error?.gas }
+                );
+            } else if (error.code === 'NETWORK_ERROR') {
+                throw new ContractError(
+                    "Error de red al interactuar con la blockchain",
+                    "NETWORK_ERROR",
+                    { network: wallet.provider.network }
+                );
+            } else if (error instanceof ContractError) {
+                throw error;
+            }
+            else {
+                throw new ContractError(
+                    "Error desconocido al interactuar con el contrato",
+                    "UNKNOWN_CONTRACT_ERROR",
+                    { originalError: error.message }
+                );
+            }
+        }
+    }
 }
 
 export default new CredentialManagement();

@@ -54,6 +54,13 @@ class UseCaseKardexRequest{
                     });
                 }
                 NotificationService.updateNotificatioToAttended(sisCode);
+                const markKardexDelivered = await CredentialManagement.markKardexAsDelivered(sisCode);
+                if (!markKardexDelivered) {
+                    throw KardexError.kardexProcessingError({
+                        details: "No se pudo marcar el kardex como entregado",
+                    });
+                }
+
                 console.log(`NFT creado/actualizado exitosamente para el estudiante: ${sisCode}`);
                 return {
                     success: true
