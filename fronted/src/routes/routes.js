@@ -7,6 +7,7 @@ const HomePageAdmin = React.lazy(() => import("../features/home/HomePageAdminist
 const StudentLoginPage = React.lazy(() => import("../features/auth/StudentLoginPaeg"));
 const NotificationPage = React.lazy(()=> import("../features/notifications/NotificationPage"));
 const FileConverterPage = React.lazy(()=> import("../features/file-converter/FileConverterPage"));
+const VerificationPage = React.lazy(()=> import("../features/verify/VerifyPage"));
 
 export const routes = [
     {
@@ -20,6 +21,10 @@ export const routes = [
         {
           path: "estudiante",
           element: <StudentLoginPage />,
+        },
+        {
+          path: "verificacion",
+          element: <VerificationPage />,
         }
       ],
     },

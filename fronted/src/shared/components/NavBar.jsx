@@ -27,8 +27,11 @@ export function NavBar() {
                     <Link to="/administracion" className="text-xl text-white hover:text-[#e3b505ff] transition-colors">
                         Administracion
                     </Link>
-                    <Link to="/estudiante" className="text-xl text-white hover:text-[#e3b505ff] transition-colors font-medium">
+                    <Link to="/estudiante" className="text-xl text-white hover:text-[#e3b505ff] transition-colors">
                         Estudiantes
+                    </Link>
+                    <Link to="/verificacion" className="text-xl text-white hover:text-[#e3b505ff] transition-colors ">
+                        Verificacion
                     </Link>
                 </nav>
                 <div className="md:hidden">

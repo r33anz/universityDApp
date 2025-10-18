@@ -9,9 +9,6 @@ import {
 
 const AdminHomePage = () => {
 
-  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-  const universityWallet = process.env.REACT_APP_WALLET_ADDRESS;
-
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
   };
