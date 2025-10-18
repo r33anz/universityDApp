@@ -54,6 +54,20 @@ class CredentialManagementService{
             throw new Error("No se pudo obtener la dirección del estudiante");
         }
     }
+
+    async getSISCodeByWallet(walletAddress) {
+        try {
+            const sisCode = await CredentialManagement.verifyWalletToSIS(walletAddress);
+            return sisCode;
+        } catch (error) {
+            console.error("Error al obtener SIS por wallet:", error);
+            // Si el contrato lanza error porque no existe, capturamos y retornamos null
+            if (error.reason && error.reason.includes("El estudiante no existe")) {
+                return null;
+            }
+            throw error;
+        }
+    }
 }
 
 export default new CredentialManagementService();

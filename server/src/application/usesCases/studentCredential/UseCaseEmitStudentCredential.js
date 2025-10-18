@@ -1,7 +1,8 @@
 import StudentService from "../../services/StudentService.js"
 import StudentSerror from "../../../interface/error/studentErrors.js";
 import CredentilaManagementService from "../../services/CredentilaManagementService.js";
-
+import { ethers } from "ethers";
+import envConfig from "../../../envConfig.js";
 class UseCaseEmitStudentCredential{
 
     async emitCredential(sisCode){
@@ -38,6 +39,73 @@ class UseCaseEmitStudentCredential{
                     "CREDENTIAL_EMISSION_ERROR");
             }
         
+    }
+
+     async verifyByWallet(walletAddress) {
+        // Validar formato de dirección Ethereum
+        console.log("1")
+        if (!this.isValidEthereumAddress(walletAddress)) {
+            throw StudentSerror.invalidInput(
+                "Dirección de wallet inválida",
+                { walletAddress },
+                "INVALID_WALLET_ADDRESS"
+            );
+        }
+        console.log("2")
+        try {
+            console.log(`Iniciando verificación para la wallet: ${walletAddress}`);
+            // Verificar en el contrato si la wallet existe
+            const sisCode = await CredentilaManagementService.getSISCodeByWallet(walletAddress);
+            
+            if (!sisCode || sisCode === "") {
+                return {
+                    isValid: false,
+                    walletAddress: walletAddress,
+                    message: "La dirección de wallet no pertenece a ningún estudiante de la Universidad San Simón"
+                };
+            }
+
+            // Obtener información adicional del estudiante si es necesario
+            const studentAddress = await CredentilaManagementService.getAddressBySIS(sisCode);
+            console.log(`Wallet ${walletAddress} verificada para el estudiante con código SIS: ${sisCode}`);
+            return {
+                isValid: true,
+                walletAddress: walletAddress,
+                sisCode: sisCode,
+                studentAddress: studentAddress,
+                message: "Estudiante verificado correctamente",
+                links: {
+                    nftTransfers: `https://testnet.bscscan.com/address/${walletAddress}#nfttransfers`,
+                    contractVerification: `https://testnet.bscscan.com/readContract?m=light&a=${envConfig.CONTRACT_ADDRESS_NFT}&n=bsc&v=${envConfig.CONTRACT_ADDRESS_NFT}#`
+                }
+            };
+
+        } catch (error) {
+            console.error("Error en verificación por wallet:", error);
+            
+            if (error.message.includes("El estudiante no existe")) {
+                return {
+                    isValid: false,
+                    walletAddress: walletAddress,
+                    message: "La dirección de wallet no pertenece a ningún estudiante registrado"
+                };
+            }
+            
+            throw StudentSerror.internal(
+                "Error al verificar la dirección de wallet",
+                { walletAddress },
+                "WALLET_VERIFICATION_ERROR"
+            );
+        }
+    }
+
+    isValidEthereumAddress(address) {
+        try {
+            return ethers.isAddress(address);
+        } catch (error) {
+            console.error("Error validando dirección Ethereum:", error);
+            return false;
+        }
     }
 }
 

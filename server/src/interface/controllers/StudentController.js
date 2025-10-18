@@ -29,6 +29,39 @@ class StudentController{
             })
         }
     }
+
+    async verifyStudentByWallet(req, res) {
+        try {
+            const { walletAddress } = req.params;
+            
+            if (!walletAddress) {
+                throw new StudentSerror("La dirección de wallet es requerida", 400);
+            }
+            
+            const verificationResult = await UseCaseEmitStudentCredential.verifyByWallet(walletAddress);
+            console.log("Verification Result:", verificationResult);
+            res.status(200).json({
+                success: true,
+                data: verificationResult
+            });
+            
+        } catch (error) {
+            if (error instanceof StudentSerror) {
+                return res.status(error.statusCode).json({
+                    success: false,
+                    message: error.message,
+                    details: error.details,
+                    errorCode: error.errorCode,
+                });
+            }
+
+            res.status(500).json({
+                success: false,
+                message: "Error interno del servidor",
+                details: process.env.NODE_ENV === "development" ? error.message : null,
+            });
+        }
+    }
 }
 
 export default new StudentController();

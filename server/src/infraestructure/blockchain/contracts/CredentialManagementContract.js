@@ -185,6 +185,37 @@ class CredentialManagement {
             }
         }
     }
+
+    async verifyWalletToSIS(walletAddress) {
+        try {
+            const sisCode = await this.contract.verifyWalletToSIS(walletAddress);
+            return sisCode;
+        } catch (error) {
+            if (error.code === 'CALL_EXCEPTION') {
+                throw new ContractError(
+                    "Error en la llamada al contrato",
+                    "CALL_EXCEPTION",
+                    {
+                        reason: error.reason,
+                        method: error.method,
+                        args: error.args
+                    }
+                );
+            } else if (error.code === 'NETWORK_ERROR') {
+                throw new ContractError(
+                    "Error de red al interactuar con la blockchain",
+                    "NETWORK_ERROR",
+                    { network: wallet.provider.network }
+                );
+            } else {
+                throw new ContractError(
+                    "Error desconocido al verificar la wallet",
+                    "UNKNOWN_CONTRACT_ERROR",
+                    { originalError: error.message }
+                );
+            }
+        }
+    }
 }
 
 export default new CredentialManagement();
