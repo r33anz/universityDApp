@@ -12,4 +12,12 @@ npx hardhat node
 npx hardhat ignition deploy ./ignition/modules/Lock.js
 ```
 
-npx hardhat run scripts/deploy.js --network bsctestnet
+#Run scripts
+``` shell
+ npx hardhat run scripts/deploy.js --network bsctestnet
+```
+
+#Verify Contract
+```shell
+npx hardhat verify --network bsctestnet <CONTRACT_ADDRESS> <CONSTRUCTOR_ARGS>
+```
