@@ -203,7 +203,6 @@ class NotificationService{
             id: notificationIds
           }
         });
-        console.log("en proceso",notifications)
         return notifications;
     }
 }

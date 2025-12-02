@@ -42,8 +42,7 @@ class UseCaseEmitStudentCredential{
     }
 
      async verifyByWallet(walletAddress) {
-        // Validar formato de dirección Ethereum
-        console.log("1")
+
         if (!this.isValidEthereumAddress(walletAddress)) {
             throw StudentSerror.invalidInput(
                 "Dirección de wallet inválida",
@@ -51,10 +50,7 @@ class UseCaseEmitStudentCredential{
                 "INVALID_WALLET_ADDRESS"
             );
         }
-        console.log("2")
         try {
-            console.log(`Iniciando verificación para la wallet: ${walletAddress}`);
-            // Verificar en el contrato si la wallet existe
             const sisCode = await CredentilaManagementService.getSISCodeByWallet(walletAddress);
             
             if (!sisCode || sisCode === "") {
@@ -65,9 +61,7 @@ class UseCaseEmitStudentCredential{
                 };
             }
 
-            // Obtener información adicional del estudiante si es necesario
             const studentAddress = await CredentilaManagementService.getAddressBySIS(sisCode);
-            console.log(`Wallet ${walletAddress} verificada para el estudiante con código SIS: ${sisCode}`);
             return {
                 isValid: true,
                 walletAddress: walletAddress,

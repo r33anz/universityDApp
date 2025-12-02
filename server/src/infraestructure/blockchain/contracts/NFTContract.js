@@ -24,10 +24,8 @@ class NFTContract {
                 mfsCid,
                 metadataURI
             );
-            console.log("TX:", tx);
             const receipt = await tx.wait();
-            console.log("Receipt:", receipt);
-
+            
             if(receipt.status === 0) {
                     throw new ContractError(
                         "Transacción revertida",

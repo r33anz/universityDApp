@@ -39,7 +39,6 @@ class StudentController{
             }
             
             const verificationResult = await UseCaseEmitStudentCredential.verifyByWallet(walletAddress);
-            console.log("Verification Result:", verificationResult);
             res.status(200).json({
                 success: true,
                 data: verificationResult

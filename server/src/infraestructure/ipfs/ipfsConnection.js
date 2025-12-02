@@ -15,9 +15,9 @@ class IPFSConnection {
       });
 
       const version = await this.client.version();
-      console.log("✅ IPFS HTTP Client conectado:", version.version);
+      console.log("IPFS HTTP Client conectado:", version.version);
     } catch (error) {
-      console.error("❌ Error al conectar IPFS HTTP:", error.message);
+      console.error("Error al conectar IPFS HTTP:", error.message);
       throw error;
     }
   }
@@ -35,7 +35,7 @@ class IPFSConnection {
   async addToMfs(cid, path) {
     try {
       await this.client.files.cp(`/ipfs/${cid}`, path, { parents: true });
-      console.log(`📁 Archivo añadido a MFS: ${path}`);
+      console.log(`Archivo añadido a MFS: ${path}`);
     } catch (error) {
       console.error('Error en MFS:', error);
       throw error;
