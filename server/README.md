@@ -22,17 +22,17 @@ npm start
 ```
 ## Comandos de Sequalize
 ### Creacion de modelo
-npx sequelize-cli model:generate --name ModelName --attributes nameAttribute:dataType,nameAttribute:dataType --models-path src/infraestructure/db/models --migrations-path src/infraestructure/db/migrations
+npx sequelize-cli model:generate --name ModelName --attributes nameAttribute:dataType,nameAttribute:dataType --models-path src/infrastructure/db/models --migrations-path src/infrastructure/db/migrations
 ### Migracion
-npx sequelize-cli db:migrate --config src/infraestructure/db/config.cjs --migrations-path src/infraestructure/db/migrations
+npx sequelize-cli db:migrate --config src/infrastructure/db/config.cjs --migrations-path src/infrastructure/db/migrations
 ### Generar seed
-npx sequelize-cli seed:generate --name demo-student --seeders-path src/infraestructure/db/seeders
+npx sequelize-cli seed:generate --name demo-student --seeders-path src/infrastructure/db/seeders
 ### Migrar todos los seed
-npx sequelize-cli db:seed:all --config src/infraestructure/db/config.cjs --seeders-path src/infraestructure/db/seeders
+npx sequelize-cli db:seed:all --config src/infrastructure/db/config.cjs --seeders-path src/infrastructure/db/seeders
 ### Revertir cambios
-npx sequelize-cli db:seed:undo:all --config src/infraestructure/db/config.cjs --seeders-path src/infraestructure/db/seeders
+npx sequelize-cli db:seed:undo:all --config src/infrastructure/db/config.cjs --seeders-path src/infrastructure/db/seeders
 ### Generar migraciones
-npx sequelize-cli migration:generate --name modifying-notification-model --migrations-path src/infraestructure/db/migrations
+npx sequelize-cli migration:generate --name modifying-notification-model --migrations-path src/infrastructure/db/migrations
 
 ***Advertencia: Error "filter not found"**
 
