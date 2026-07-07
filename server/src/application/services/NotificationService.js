@@ -1,4 +1,4 @@
-import notification from "../../infraestructure/db/models/notification.js"
+import notification from "../../infrastructure/db/models/notification.js"
 import { io } from "../../app.js";
 import dayjs from "dayjs";
 import { STATUS_ENUM } from "../../interface/enums/statusEnums.js";
@@ -37,7 +37,7 @@ class NotificationService{
         });
     }
 
-    async lastNotificacion(){
+    async lastNotification(){
         const lastNotification = await notification.findOne({
             order: [["emittedAt","DESC"]]
         });
@@ -134,7 +134,7 @@ class NotificationService{
         }
     }
 
-    async studentsAskKardex(sisCode){
+    async studentAskedKardex(sisCode){
   
       try {
         const result = await notification.findOne({
@@ -150,7 +150,7 @@ class NotificationService{
       }
     }
 
-    async updateNotificatioToAttended(sisCode){
+    async updateNotificationToAttended(sisCode){
       try {
         if (!sisCode) {
           throw new Error("SIS code is required");
