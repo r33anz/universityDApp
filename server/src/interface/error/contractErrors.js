@@ -1,14 +1,18 @@
-class ContractError extends Error {
+import AppError from './AppError.js';
+
+/**
+ * Specialized AppError for on-chain failures. The middleware treats it the
+ * same as any other AppError, but the `isContractError` flag lets the
+ * useCase layer (UseCaseKardexRequest) re-wrap it as a KardexError.
+ */
+export default class ContractError extends AppError {
     constructor(message, errorCode, details = null) {
-        super(message);
-        this.name = "ContractError";
-        this.errorCode = errorCode;
-        this.details = details;
+        super(message, 500, details, errorCode);
         this.isContractError = true;
     }
 
     static transactionReverted(reason, txHash) {
-        return new ContractError(
+        return new this(
             `Transacción revertida: ${reason}`,
             "TX_REVERTED",
             { transactionHash: txHash }
@@ -16,12 +20,10 @@ class ContractError extends Error {
     }
 
     static insufficientFunds(requiredGas) {
-        return new ContractError(
+        return new this(
             "Fondos insuficientes para la transacción",
             "INSUFFICIENT_FUNDS",
             { requiredGas }
         );
     }
 }
-
-export default ContractError;
