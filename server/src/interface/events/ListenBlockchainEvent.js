@@ -1,20 +1,12 @@
-import { ethers } from "ethers";
-import UseCaseKardexRequest from "../../application/usesCases/kardex/UseCaseKardexRequest.js";
-import contract from "../../infraestructure/blockchain/contracts/contractManagementInstance.js";
+import UseCaseKardexRequest from "../../application/useCases/kardex/UseCaseKardexRequest.js";
+import CredentialManagement from "../../infrastructure/blockchain/contracts/CredentialManagementContract.js";
 
-class ListenBlockchainEvent{
-
-    constructor(){
-        this.contract = contract;
-    }
-
-    listening(){
-        contract.on("RequestKardex", async (codSIS, address, timeRequested) => {
-            const timestamp = Number(timeRequested);
-            const requestDate = new Date(timestamp * 1000);
-            UseCaseKardexRequest.listeningResquest(codSIS,requestDate)
+class ListenBlockchainEvent {
+    listening() {
+        CredentialManagement.contract.on("RequestKardex", async (codSIS, _address, timeRequested) => {
+            const requestDate = new Date(Number(timeRequested) * 1000);
+            UseCaseKardexRequest.listeningRequest(codSIS, requestDate);
         });
-
     }
 }
 
