@@ -1,75 +1,79 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { 
-  UploadIcon, 
-  NotificationsIcon, 
-  InfoIcon, 
-  CopyIcon 
-} from "../../shared/components/Icons";
+import { UploadIcon, NotificationsIcon } from "../../shared/components/Icons";
 
 const AdminHomePage = () => {
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-  };
-
-  const truncateAddress = (address) => {
-    if (!address) return "Dirección no configurada";
-    return address;
-  };
-
   return (
-    <div className="flex flex-col items-center justify-start px-4 py-6"> 
-      <div className="text-center max-w-4xl w-full mb-6"> 
-        <h1 className="text-3xl font-bold text-[#184494ff] mb-2"> 
-          Panel de Administración
+    <div className="flex flex-col items-center justify-start px-4 py-8">
+      <div className="text-center max-w-2xl w-full mb-10">
+        <h1 className="text-3xl font-bold text-brand-blue dark:text-blue-300 mb-2">
+          Panel de Administracion
         </h1>
-        <p className="text-md text-gray-600 mb-6"> 
-          Gestión integral de kardex académico mediante blockchain
+        <p className="theme-text-secondary">
+          Gestion integral de kardex academico mediante blockchain
         </p>
       </div>
 
-
-      <div className="grid md:grid-cols-2 gap-4 max-w-4xl w-full"> 
-        {/* Card para subida de archivos */}
-        <div className="bg-white rounded-xl shadow p-6 border border-gray-100"> 
-          <h2 className="text-xl font-semibold text-[#184494ff] mb-2 flex items-center gap-2"> 
-            <UploadIcon className="w-5 h-5" /> 
-            Carga de Kardex
-          </h2>
-          <p className="text-sm text-gray-600 mb-2"> 
-            Sube el kardex estudiantil en formato JSON. El sistema verificará que el código SIS del estudiante coincida con el registrado en el kardex antes de proceder con la carga.
+      <div className="grid md:grid-cols-2 gap-5 max-w-3xl w-full">
+        <div className="theme-card rounded-xl shadow-sm p-6 border hover:shadow-md transition-shadow group">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2.5 bg-brand-blue/10 dark:bg-brand-blue/20 rounded-xl group-hover:bg-brand-blue/15 dark:group-hover:bg-brand-blue/30 transition-colors">
+              <UploadIcon className="w-5 h-5 text-brand-blue dark:text-blue-300" />
+            </div>
+            <h2 className="text-lg font-semibold theme-text">Carga de Kardex</h2>
+          </div>
+          <p className="text-sm theme-text-secondary mb-3">
+            Sube el kardex estudiantil en formato JSON. El sistema verificara que el codigo SIS coincida antes de proceder.
           </p>
-          <ul className="text-xs text-gray-500 mb-4 pl-4 list-disc">
-            <li>Formato aceptado: JSON</li>
-            <li>Validación automática de código SIS</li>
-            <li>Registro en blockchain tras validación</li>
+          <ul className="text-xs theme-text-tertiary mb-5 space-y-1.5">
+            <li className="flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-brand-blue/30"></span>
+              Formato aceptado: JSON
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-brand-blue/30"></span>
+              Validacion automatica de codigo SIS
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-brand-blue/30"></span>
+              Registro en blockchain tras validacion
+            </li>
           </ul>
           <Link
             to="/administracion/manejo_archivo"
-            className="inline-block w-full bg-[#088404] text-white py-2 px-4 rounded-lg text-sm text-center" 
+            className="inline-flex items-center justify-center w-full bg-brand-blue text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-brand-blue/90 transition-colors"
           >
             Ir a Carga de Archivos
           </Link>
         </div>
 
-        {/* Card para notificaciones */}
-        <div className="bg-white rounded-xl shadow p-6 border border-gray-100"> 
-          <h2 className="text-xl font-semibold text-[#184494ff] mb-2 flex items-center gap-2"> 
-            <NotificationsIcon className="w-5 h-5" /> 
-            Solicitudes de Kardex
-          </h2>
-          <p className="text-sm text-gray-600 mb-2"> 
-            Gestiona las notificaciones y solicitudes de kardex. El sistema enviará mensajes al email del websis solicitando los kardex de los estudiantes que lo requieran.
+        <div className="theme-card rounded-xl shadow-sm p-6 border hover:shadow-md transition-shadow group">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2.5 bg-brand-gold/10 dark:bg-brand-gold/20 rounded-xl group-hover:bg-brand-gold/15 dark:group-hover:bg-brand-gold/30 transition-colors">
+              <NotificationsIcon className="w-5 h-5 text-brand-gold" />
+            </div>
+            <h2 className="text-lg font-semibold theme-text">Solicitudes de Kardex</h2>
+          </div>
+          <p className="text-sm theme-text-secondary mb-3">
+            Gestiona las notificaciones y solicitudes de kardex. El sistema enviara mensajes al email del WEBSIS.
           </p>
-          <ul className="text-xs text-gray-500 mb-4 pl-4 list-disc">
-            <li>Gestión de solicitudes entrantes</li>
-            <li>Notificaciones por correo electrónico</li>
-            <li>Seguimiento de solicitudes pendientes</li>
+          <ul className="text-xs theme-text-tertiary mb-5 space-y-1.5">
+            <li className="flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-brand-gold/30"></span>
+              Gestion de solicitudes entrantes
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-brand-gold/30"></span>
+              Notificaciones por correo electronico
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-brand-gold/30"></span>
+              Seguimiento de solicitudes pendientes
+            </li>
           </ul>
           <Link
             to="/administracion/notificaciones"
-            className="inline-block w-full bg-[#088404] text-white py-2 px-4 rounded-lg text-sm text-center" 
+            className="inline-flex items-center justify-center w-full bg-brand-gold text-gray-900 py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-brand-gold/90 transition-colors"
           >
             Gestionar Solicitudes
           </Link>
