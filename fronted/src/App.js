@@ -1,14 +1,18 @@
 import React from "react";
 import { AppRouter } from "./routes/AppRouter";
 import { ToastProvider } from "./shared/providers/ToastProvider";
-
-const apiUrl = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}`;
+import { ThemeProvider } from "./shared/providers/ThemeProvider";
+import { ErrorBoundary } from "./shared/components/ErrorBoundary";
 
 function App() {
     return (
-        <ToastProvider>
-             <AppRouter />
-        </ToastProvider>    
+        <ThemeProvider>
+            <ErrorBoundary>
+                <ToastProvider>
+                    <AppRouter />
+                </ToastProvider>
+            </ErrorBoundary>
+        </ThemeProvider>
     );
 }
 
