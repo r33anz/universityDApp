@@ -1,8 +1,8 @@
-import NFTContract from "../../infraestructure/blockchain/contracts/NFTContract.js";
-import CredentialManagement from "../../infraestructure/blockchain/contracts/CredentialManagementContract.js";
+import NFTContract from "../../infrastructure/blockchain/contracts/NFTContract.js";
+import CredentialManagement from "../../infrastructure/blockchain/contracts/CredentialManagementContract.js";
 import { createURINFTTemplate } from "../../interface/uriNFTtemplate/URINFTTemplate.js";
 import IpfsService from "./IpfsService.js";
-import envConfig from "../../envConfig.js";
+import config from "../../infrastructure/config/env.js";
 
 class NFTService{
     async manageNFT(siscode, mfsCID) {
@@ -13,7 +13,7 @@ class NFTService{
             const hasExistingKardex = await NFTContract.hasKardex(address);
             
             if (hasExistingKardex) {
-                await NFTContract.updateProgress(address, mfsCID, `${envConfig.IPFS_GATEWAY}${cidJSON}`);
+                await NFTContract.updateProgress(address, mfsCID, `${config.ipfs.gatewayUrl}${cidJSON}`);
             } else {
                 await NFTContract.mintStudentKardex(
                     address, 
