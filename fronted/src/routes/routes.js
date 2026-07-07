@@ -1,10 +1,10 @@
-import React, { Children } from "react";
+import React from "react";
 import { Layout } from "../shared/components/Layout";
 import { LayoutDashboard } from "../shared/components/LayoutDashboard";
 
 const HomePage = React.lazy(() => import("../features/home/HomePage"));
 const HomePageAdmin = React.lazy(() => import("../features/home/HomePageAdministration"));
-const StudentLoginPage = React.lazy(() => import("../features/auth/StudentLoginPaeg"));
+const StudentLoginPage = React.lazy(() => import("../features/auth/StudentLoginPage"));
 const NotificationPage = React.lazy(()=> import("../features/notifications/NotificationPage"));
 const FileConverterPage = React.lazy(()=> import("../features/file-converter/FileConverterPage"));
 const VerificationPage = React.lazy(()=> import("../features/verify/VerifyPage"));

@@ -1,3 +1,63 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-surface: #f8f9fb;
+    --bg-card: #ffffff;
+    --bg-muted: #f1f3f7;
+    --bg-elevated: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-tertiary: #9ca3af;
+    --border-primary: #e5e7eb;
+    --border-secondary: #f3f4f6;
+  }
+
+  .dark {
+    --bg-surface: #0f1729;
+    --bg-card: #1a2540;
+    --bg-muted: #1e2d4a;
+    --bg-elevated: #223052;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --border-primary: #2a3a5c;
+    --border-secondary: #1e2d4a;
+  }
+
+  body {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+@layer components {
+  .theme-surface {
+    background-color: var(--bg-surface);
+  }
+  .theme-card {
+    background-color: var(--bg-card);
+    border-color: var(--border-primary);
+  }
+  .theme-muted {
+    background-color: var(--bg-muted);
+  }
+  .theme-elevated {
+    background-color: var(--bg-elevated);
+  }
+  .theme-text {
+    color: var(--text-primary);
+  }
+  .theme-text-secondary {
+    color: var(--text-secondary);
+  }
+  .theme-text-tertiary {
+    color: var(--text-tertiary);
+  }
+  .theme-border {
+    border-color: var(--border-primary);
+  }
+}
