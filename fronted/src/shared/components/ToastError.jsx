@@ -1,67 +1,53 @@
-import React from "react"
-import { createPortal } from "react-dom"
-import { AlertTriangleIcon, CheckCircleIcon, XIcon, InfoIcon } from "./Icons"
+import React from "react";
+import { createPortal } from "react-dom";
+import { AlertTriangleIcon, CheckCircleIcon, XIcon, InfoIcon } from "./Icons";
 
 export const ToastContainer = ({ children }) => {
   return createPortal(
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
+    <div
+      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 items-center"
+      role="alert"
+      aria-live="polite"
+    >
       {children}
     </div>,
     document.body,
-  )
-}
+  );
+};
 
 export const Toast = ({ message, type = "info", onClose, autoClose = true, duration = 5000 }) => {
   React.useEffect(() => {
-    let timer
+    let timer;
     if (autoClose) {
       timer = setTimeout(() => {
-        onClose()
-      }, duration)
+        onClose();
+      }, duration);
     }
     return () => {
-      if (timer) clearTimeout(timer)
-    }
-  }, [autoClose, duration, onClose])
+      if (timer) clearTimeout(timer);
+    };
+  }, [autoClose, duration, onClose]);
 
-  const getIcon = () => {
-    switch (type) {
-      case "success":
-        return <CheckCircleIcon className="h-5 w-5 text-green-500" />
-      case "error":
-        return <AlertTriangleIcon className="h-5 w-5 text-red-500" />
-      case "warning":
-        return <AlertTriangleIcon className="h-5 w-5 text-yellow-500" />
-      default:
-        return <InfoIcon className="h-5 w-5 text-blue-500" />
-    }
-  }
+  const styles = {
+    success: { bg: "bg-brand-teal/5 dark:bg-brand-teal/10 border-brand-teal/20", icon: <CheckCircleIcon className="h-5 w-5 text-brand-teal" /> },
+    error:   { bg: "bg-brand-red/5 dark:bg-brand-red/10 border-brand-red/20", icon: <AlertTriangleIcon className="h-5 w-5 text-brand-red" /> },
+    warning: { bg: "bg-brand-gold/5 dark:bg-brand-gold/10 border-brand-gold/20", icon: <AlertTriangleIcon className="h-5 w-5 text-brand-gold" /> },
+    info:    { bg: "bg-brand-blue/5 dark:bg-brand-blue/10 border-brand-blue/20", icon: <InfoIcon className="h-5 w-5 text-brand-blue" /> },
+  };
 
-  const getBackgroundColor = () => {
-    switch (type) {
-      case "success":
-        return "bg-green-50 border-green-200"
-      case "error":
-        return "bg-red-50 border-red-200"
-      case "warning":
-        return "bg-yellow-50 border-yellow-200"
-      default:
-        return "bg-blue-50 border-blue-200"
-    }
-  }
+  const { bg, icon } = styles[type] || styles.info;
 
   return (
-    <div className={`rounded-lg shadow-md border p-4 ${getBackgroundColor()} animate-in slide-in-from-right`}>
+    <div className={`rounded-xl shadow-lg border px-4 py-3 ${bg} backdrop-blur-sm min-w-[300px] max-w-md`} style={{ backgroundColor: 'var(--bg-card)' }}>
       <div className="flex items-start">
-        <div className="flex-shrink-0 mr-3">{getIcon()}</div>
+        <div className="flex-shrink-0 mr-3 mt-0.5">{icon}</div>
         <div className="flex-1">
-          <p className="text-sm text-gray-800">{message}</p>
+          <p className="text-sm theme-text">{message}</p>
         </div>
-        <button onClick={onClose} className="ml-4 text-gray-400 hover:text-gray-600">
+        <button onClick={onClose} className="ml-3 theme-text-tertiary hover:opacity-80 transition-colors">
           <XIcon className="h-4 w-4" />
         </button>
       </div>
     </div>
-  )
-}
-
+  );
+};

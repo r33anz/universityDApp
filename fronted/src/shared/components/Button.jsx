@@ -1,30 +1,28 @@
 import React from "react";
 import cn from "../lib/utils";
 
-
 const buttonVariants = {
-    default: "bg-[#184494ff] text-white hover:bg-[#184494ff]/90",
-    destructive: "bg-[#e80414ff] text-white hover:bg-[#e80414ff]/90",
-    outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-    secondary: "bg-[#107e7dff] text-white hover:bg-[#107e7dff]/90",
-    ghost: "hover:bg-accent hover:text-accent-foreground",
-    link: "text-[#184494ff] underline-offset-4 hover:underline",
-  }
-  
-  const buttonSizes = {
+    default: "bg-brand-blue text-white hover:bg-brand-blue/90",
+    destructive: "bg-brand-red text-white hover:bg-brand-red/90",
+    outline: "border theme-text-secondary hover:bg-black/5 dark:hover:bg-white/10",
+    secondary: "bg-brand-teal text-white hover:bg-brand-teal/90",
+    ghost: "hover:bg-black/5 dark:hover:bg-white/10 theme-text-secondary",
+    link: "text-brand-blue dark:text-blue-300 underline-offset-4 hover:underline",
+};
+
+const buttonSizes = {
     default: "h-10 px-4 py-2",
     sm: "h-9 rounded-md px-3",
     lg: "h-11 rounded-md px-8",
     icon: "h-10 w-10",
-  }
-  
-  export const Button = React.forwardRef(
-    ({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
-      const Comp = asChild ? React.Fragment : "button"
+};
+
+export const Button = React.forwardRef(
+    ({ className, variant = "default", size = "default", ...props }, ref) => {
       return (
-        <Comp
+        <button
           className={cn(
-            "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+            "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
             buttonVariants[variant],
             buttonSizes[size],
             className,
@@ -32,10 +30,8 @@ const buttonVariants = {
           ref={ref}
           {...props}
         />
-      )
+      );
     },
-  )
-  
-  Button.displayName = "Button"
-  
-  
+);
+
+Button.displayName = "Button";
