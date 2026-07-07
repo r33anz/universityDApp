@@ -1,15 +1,6 @@
-import { useState,useEffect } from "react";
-import { listenForNotifications,recoverAllNotifications } from "../service/notificationService";
-import axios from "axios";
-
-export const STATUS_FILTERS = {
-  ALL: 'ALL',
-  ATTENDED: 'attended',
-  IN_PROCESS: 'in_process',
-  NOT_ATTENDED: 'not_attended'
-};
-
-const apiUrl = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}`;
+import { useState, useEffect, useRef, useCallback } from "react";
+import { listenForNotifications, recoverAllNotifications, disconnectSocket, attendNotifications } from "../service/notificationService";
+import { STATUS_FILTERS } from "../notificationConstants";
 
 export function useNotifications(){
   const [notificationsData, setNotificationsData] = useState({
@@ -21,22 +12,24 @@ export function useNotifications(){
     loading: false,
     error: null
   });
-  
-  const [statusFilter, setStatusFilter] = useState(STATUS_FILTERS.ALL);
+
+  const [statusFilter, setStatusFilter] = useState(STATUS_FILTERS.ALL.value);
   const [selectedNotifications, setSelectedNotifications] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const mountedRef = useRef(true);
 
-  const loadNotifications = async ({page = 1, filter=null}) => {
+  const loadNotifications = useCallback(async ({page = 1, filter = null}) => {
     try {
-      
       setNotificationsData(prev => ({ ...prev, loading: true }));
-      
-      const response = await recoverAllNotifications({ 
-        page, 
-        pageSize: 10, 
-        statusFilter: filter 
+
+      const response = await recoverAllNotifications({
+        page,
+        pageSize: 10,
+        statusFilter: filter
       });
-      
+
+      if (!mountedRef.current) return;
+
       setNotificationsData({
         notifications: response.notifications,
         total: response.total,
@@ -46,24 +39,26 @@ export function useNotifications(){
         loading: false,
         error: null
       });
-      
+
     } catch (error) {
-      console.error("Error fetching notifications:", error);
-      setNotificationsData(prev => ({ 
-        ...prev, 
-        loading: false, 
-        error: error.message 
+      if (!mountedRef.current) return;
+      setNotificationsData(prev => ({
+        ...prev,
+        loading: false,
+        error: "Error al cargar notificaciones"
       }));
     }
-  };
+  }, []);
 
   useEffect(() => {
-    
-    loadNotifications(1, statusFilter);
+    mountedRef.current = true;
+
+    loadNotifications({ page: 1, filter: statusFilter });
 
     const unsubscribe = listenForNotifications((newNotification) => {
+      if (!mountedRef.current) return;
       setNotificationsData(prev => {
-        if (statusFilter === STATUS_FILTERS.ALL || 
+        if (statusFilter === STATUS_FILTERS.ALL.value ||
             newNotification.status === statusFilter) {
           return {
             ...prev,
@@ -75,23 +70,27 @@ export function useNotifications(){
       });
     });
 
-    return () => unsubscribe();
-  }, [statusFilter]);
+    return () => {
+      mountedRef.current = false;
+      unsubscribe();
+      disconnectSocket();
+    };
+  }, [statusFilter, loadNotifications]);
 
   const changePage = (newPage) => {
     if (newPage >= 1 && newPage <= notificationsData.totalPages) {
-      loadNotifications(newPage, statusFilter);
+      loadNotifications({ page: newPage, filter: statusFilter });
     }
   };
 
   const changeFilter = (newFilter) => {
     setStatusFilter(newFilter);
-    loadNotifications(1, newFilter); 
+    setSelectedNotifications([]);
   };
 
   const toggleNotificationSelection = (id) => {
-    setSelectedNotifications(prev => 
-      prev.includes(id) 
+    setSelectedNotifications(prev =>
+      prev.includes(id)
         ? prev.filter(item => item !== id)
         : [...prev, id]
     );
@@ -105,41 +104,56 @@ export function useNotifications(){
     }
   };
 
+  const attendSingle = async (notificationId) => {
+    try {
+      const response = await attendNotifications([notificationId]);
+      if (!mountedRef.current) return;
+      if (response.success) {
+        await loadNotifications({ page: notificationsData.page, filter: statusFilter });
+      }
+    } catch (error) {
+      if (!mountedRef.current) return;
+      setNotificationsData(prev => ({
+        ...prev,
+        error: "Error al atender la notificación"
+      }));
+    }
+  };
+
   const attendSelected = async () => {
     try {
       if (selectedNotifications.length === 0) return;
-      console.log("Mandando solicitud lsita ",selectedNotifications )
 
-      const response = await axios.post(`${apiUrl}/api/attend-multiple`, {
-        notificationIds: selectedNotifications 
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await attendNotifications(selectedNotifications);
 
-      if(response.data.success){
+      if (!mountedRef.current) return;
+
+      if(response.success){
         setIsModalOpen(false);
         setSelectedNotifications([]);
         await loadNotifications({ page: 1 });
       }
-      
+
     } catch (error) {
-      console.error("Error attending notifications:", error);
+      if (!mountedRef.current) return;
+      setNotificationsData(prev => ({
+        ...prev,
+        error: "Error al atender notificaciones"
+      }));
     }
   };
-  
-  return { 
+
+  return {
     notificationsData,
     statusFilter,
     changePage,
     changeFilter,
-    STATUS_FILTERS,
     loadNotifications,
     toggleNotificationSelection,
     toggleSelectAll,
+    attendSingle,
     attendSelected,
-    isModalOpen, 
+    isModalOpen,
     setIsModalOpen,
     setSelectedNotifications,
     selectedNotifications
