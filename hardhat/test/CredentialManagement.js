@@ -270,7 +270,7 @@ describe("CredentialStudentManagement", function () {
         });
     });
 
-    describe("Seguridad y Edge Cases", function () {
+    describe("Seguridad y casos límite", function () {
         it("Debe manejar múltiples estudiantes correctamente", async function () {
             await credentialContract.connect(owner).emitCredential(STUDENT_SIS_1, student1.address);
             await credentialContract.connect(owner).emitCredential(STUDENT_SIS_2, student2.address);

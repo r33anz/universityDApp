@@ -18,25 +18,25 @@ describe("KardexNFT", function () {
         await kardexNFT.waitForDeployment();
     });
 
-    describe("Deployment", function () {
-        it("Should set the right owner", async function () {
+    describe("Despliegue", function () {
+        it("Debe establecer el owner correctamente", async function () {
             expect(await kardexNFT.owner()).to.equal(owner.address);
         });
 
-        it("Should have correct name and symbol", async function () {
+        it("Debe tener el nombre y símbolo correctos", async function () {
             expect(await kardexNFT.name()).to.equal("UMSSKardex");
             expect(await kardexNFT.symbol()).to.equal("UMSSKRDX");
         });
 
-        it("Should start with token counter at 0", async function () {
+        it("Debe iniciar con el contador de tokens en 0", async function () {
             // El contrato usa _tokenIdCounter privado, no hay función totalSupply
             // Verificamos que no existan tokens inicialmente
             expect(await kardexNFT.balanceOf(owner.address)).to.equal(0);
         });
     });
 
-    describe("Minting", function () {
-        it("Should mint a new NFT for a student", async function () {
+    describe("Acuñación (Minting)", function () {
+        it("Debe acuñar un nuevo NFT para un estudiante", async function () {
             await expect(
                 kardexNFT.connect(owner).mintStudentKardex(
                     student1.address, 
@@ -51,7 +51,7 @@ describe("KardexNFT", function () {
             expect(await kardexNFT.ownerOf(1)).to.equal(student1.address);
         });
 
-        it("Should store correct kardex info", async function () {
+        it("Debe almacenar la información del kardex correctamente", async function () {
             await kardexNFT.connect(owner).mintStudentKardex(
                 student1.address, 
                 STUDENT_ID_1, 
@@ -67,7 +67,7 @@ describe("KardexNFT", function () {
             expect(kardexInfo.currentIpfsCid).to.equal(IPFS_CID);
         });
 
-        it("Should mint multiple NFTs with incremental IDs", async function () {
+        it("Debe acuñar múltiples NFTs con IDs incrementales", async function () {
             await kardexNFT.connect(owner).mintStudentKardex(
                 student1.address, 
                 STUDENT_ID_1, 
@@ -86,8 +86,8 @@ describe("KardexNFT", function () {
             expect(await kardexNFT.ownerOf(2)).to.equal(student2.address);
         });
 
-        describe("Minting Validations", function () {
-            it("Should revert if called by non-owner", async function () {
+        describe("Validaciones de acuñación", function () {
+            it("Debe revertir si lo llama una cuenta que no es el owner", async function () {
                 await expect(
                     kardexNFT.connect(student1).mintStudentKardex(
                         student1.address, 
@@ -98,7 +98,7 @@ describe("KardexNFT", function () {
                 ).to.be.revertedWithCustomError(kardexNFT, "OwnableUnauthorizedAccount");
             });
 
-            it("Should revert with invalid address", async function () {
+            it("Debe revertir con una dirección inválida", async function () {
                 await expect(
                     kardexNFT.connect(owner).mintStudentKardex(
                         ethers.ZeroAddress, 
@@ -109,7 +109,7 @@ describe("KardexNFT", function () {
                 ).to.be.revertedWith("Direccion invalida");
             });
 
-            it("Should revert if student already has NFT", async function () {
+            it("Debe revertir si el estudiante ya tiene un NFT", async function () {
                 await kardexNFT.connect(owner).mintStudentKardex(
                     student1.address, 
                     STUDENT_ID_1, 
@@ -127,7 +127,7 @@ describe("KardexNFT", function () {
                 ).to.be.revertedWith("Estudiante ya tiene NFT");
             });
 
-            it("Should revert if student ID already exists", async function () {
+            it("Debe revertir si el Student ID ya existe", async function () {
                 await kardexNFT.connect(owner).mintStudentKardex(
                     student1.address, 
                     STUDENT_ID_1, 
@@ -145,7 +145,7 @@ describe("KardexNFT", function () {
                 ).to.be.revertedWith("Student ID ya existe");
             });
 
-            it("Should revert with empty student ID", async function () {
+            it("Debe revertir con un Student ID vacío", async function () {
                 await expect(
                     kardexNFT.connect(owner).mintStudentKardex(
                         student1.address, 
@@ -158,7 +158,7 @@ describe("KardexNFT", function () {
         });
     });
 
-    describe("Progress Updates", function () {
+    describe("Actualización de progreso", function () {
         beforeEach(async function () {
             await kardexNFT.connect(owner).mintStudentKardex(
                 student1.address, 
@@ -168,7 +168,7 @@ describe("KardexNFT", function () {
             );
         });
 
-        it("Should update student progress correctly", async function () {
+        it("Debe actualizar el progreso del estudiante correctamente", async function () {
             const newIpfsCid = "QmNewIpfsCid";
             const newMetadataUri = "https://local-dominio/ipfs/QmNewMetadata";
 
@@ -186,7 +186,7 @@ describe("KardexNFT", function () {
             expect(kardexInfo.version).to.equal(2);
         });
 
-        it("Should revert if student doesn't have NFT", async function () {
+        it("Debe revertir si el estudiante no tiene NFT", async function () {
             await expect(
                 kardexNFT.connect(owner).updateStudentProgress(
                     student2.address,
@@ -196,7 +196,7 @@ describe("KardexNFT", function () {
             ).to.be.revertedWith("Estudiante no tiene NFT");
         });
 
-        it("Should revert if called by non-owner", async function () {
+        it("Debe revertir si lo llama una cuenta que no es el owner", async function () {
             await expect(
                 kardexNFT.connect(student1).updateStudentProgress(
                     student1.address,
@@ -206,7 +206,7 @@ describe("KardexNFT", function () {
             ).to.be.revertedWithCustomError(kardexNFT, "OwnableUnauthorizedAccount");
         });
 
-        it("Should revert if kardex is inactive", async function () {
+        it("Debe revertir si el kardex está inactivo", async function () {
             // Primero desactivamos el kardex manualmente modificando el estado
             const kardexInfo = await kardexNFT.kardexInfo(1);
             
@@ -227,7 +227,7 @@ describe("KardexNFT", function () {
         });
     });
 
-    describe("View Functions", function () {
+    describe("Funciones de consulta", function () {
         beforeEach(async function () {
             await kardexNFT.connect(owner).mintStudentKardex(
                 student1.address, 
@@ -237,19 +237,19 @@ describe("KardexNFT", function () {
             );
         });
 
-        it("Should return correct kardex info", async function () {
+        it("Debe retornar la información del kardex correctamente", async function () {
             const kardexInfo = await kardexNFT.getStudentKardex(student1.address);
             expect(kardexInfo.student).to.equal(student1.address);
             expect(kardexInfo.studentId).to.equal(STUDENT_ID_1);
             expect(kardexInfo.isActive).to.equal(true);
         });
 
-        it("Should check if student has kardex", async function () {
+        it("Debe verificar si el estudiante tiene kardex", async function () {
             expect(await kardexNFT.hasKardex(student1.address)).to.equal(true);
             expect(await kardexNFT.hasKardex(student2.address)).to.equal(false);
         });
 
-        it("Should return student progress", async function () {
+        it("Debe retornar el progreso del estudiante", async function () {
             const [tokenId, version, lastUpdated] = 
                 await kardexNFT.getStudentProgress(student1.address);
             
@@ -259,7 +259,7 @@ describe("KardexNFT", function () {
         });
     });
 
-    describe("Transfer Restrictions", function () {
+    describe("Restricciones de transferencia", function () {
         beforeEach(async function () {
             await kardexNFT.connect(owner).mintStudentKardex(
                 student1.address, 
@@ -269,26 +269,26 @@ describe("KardexNFT", function () {
             );
         });
 
-        it("Should prevent transfers between addresses", async function () {
+        it("Debe impedir transferencias entre direcciones", async function () {
             await expect(
                 kardexNFT.connect(student1).transferFrom(student1.address, student2.address, 1)
             ).to.be.revertedWith("NFT no transferible");
         });
 
-        it("Should prevent approvals", async function () {
+        it("Debe impedir las aprobaciones", async function () {
             await expect(
                 kardexNFT.connect(student1).approve(student2.address, 1)
             ).to.be.revertedWith("NFT no transferible");
         });
 
-        it("Should prevent setApprovalForAll", async function () {
+        it("Debe impedir setApprovalForAll", async function () {
             await expect(
                 kardexNFT.connect(student1).setApprovalForAll(student2.address, true)
             ).to.be.revertedWith("NFT no transferible");
         });
     });
 
-    describe("Burning", function () {
+    describe("Quemado (Burning)", function () {
         beforeEach(async function () {
             await kardexNFT.connect(owner).mintStudentKardex(
                 student1.address, 
@@ -298,7 +298,7 @@ describe("KardexNFT", function () {
             );
         });
 
-        it("Should burn kardex correctly", async function () {
+        it("Debe quemar el kardex correctamente", async function () {
             await expect(
                 kardexNFT.connect(owner).burnKardex(1)
             ).to.emit(kardexNFT, "KardexDeleted")
@@ -310,21 +310,21 @@ describe("KardexNFT", function () {
             await expect(kardexNFT.ownerOf(1)).to.be.revertedWithCustomError(kardexNFT, "ERC721NonexistentToken");
         });
 
-        it("Should revert if token doesn't exist", async function () {
+        it("Debe revertir si el token no existe", async function () {
             await expect(
                 kardexNFT.connect(owner).burnKardex(999)
             ).to.be.revertedWith("Token no existe");
         });
 
-        it("Should revert if called by non-owner", async function () {
+        it("Debe revertir si lo llama una cuenta que no es el owner", async function () {
             await expect(
                 kardexNFT.connect(student1).burnKardex(1)
             ).to.be.revertedWithCustomError(kardexNFT, "OwnableUnauthorizedAccount");
         });
     });
 
-    describe("Interface Support", function () {
-        it("Should support required interfaces", async function () {
+    describe("Soporte de interfaces", function () {
+        it("Debe soportar las interfaces requeridas", async function () {
             // ERC721
             expect(await kardexNFT.supportsInterface("0x80ac58cd")).to.equal(true);
             // ERC721Metadata
@@ -334,8 +334,8 @@ describe("KardexNFT", function () {
         });
     });
 
-    describe("Edge Cases", function () {
-        it("Should handle multiple updates correctly", async function () {
+    describe("Casos límite", function () {
+        it("Debe manejar múltiples actualizaciones correctamente", async function () {
             await kardexNFT.connect(owner).mintStudentKardex(
                 student1.address, 
                 STUDENT_ID_1, 
@@ -343,17 +343,17 @@ describe("KardexNFT", function () {
                 METADATA_URI
             );
 
-            // Multiple updates
+            // Múltiples actualizaciones
             await kardexNFT.connect(owner).updateStudentProgress(student1.address, "cid1", "uri1");
             await kardexNFT.connect(owner).updateStudentProgress(student1.address, "cid2", "uri2");
             await kardexNFT.connect(owner).updateStudentProgress(student1.address, "cid3", "uri3");
 
             const kardexInfo = await kardexNFT.kardexInfo(1);
-            expect(kardexInfo.version).to.equal(4); // Started at 1, updated 3 times
+            expect(kardexInfo.version).to.equal(4); // Inició en 1, se actualizó 3 veces
             expect(kardexInfo.currentIpfsCid).to.equal("cid3");
         });
 
-        it("Should handle long strings", async function () {
+        it("Debe manejar cadenas largas", async function () {
             const longStudentId = "A".repeat(50);
             const longIpfsCid = "Qm" + "B".repeat(44);
             const longMetadataUri = "https://example.com/" + "C".repeat(100);
