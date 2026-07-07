@@ -1,7 +1,7 @@
-import ipfsConnection from "../../infraestructure/ipfs/ipfsConnection.js";
+import ipfsConnection from "../../infrastructure/ipfs/ipfsConnection.js";
 import { Blob } from 'buffer';
 import KardexError from "../../interface/error/kardexErrors.js";
-import envConfig from "../../envConfig.js";
+import config from "../../infrastructure/config/env.js";
 
 class IPFSService{
     async uploadMultiplePdfs(pdfs, overwrite = false) {
@@ -35,9 +35,7 @@ class IPFSService{
                     );
                 }
 
-                const filename = overwrite
-                    ? pdf.filename
-                    : `${pdf.filename.replace(".pdf", "")}_${Date.now()}.pdf`;
+                const filename = pdf.filename;
                 const fullPath = `${pdf.path}${filename}`;
 
                 const { cid } = await ipfsConnection.client.add(pdf.blob, {
@@ -100,7 +98,7 @@ class IPFSService{
             return {
                 success: true,
                 dirCid: rootCid,
-                ipfsLink: `${envConfig.IPFS_GATEWAY}${rootCid}`,
+                ipfsLink: `${config.ipfs.gatewayUrl}${rootCid}`,
                 files: results,
             };
         } catch (error) {
@@ -112,7 +110,7 @@ class IPFSService{
                 "Error al subir archivos a IPFS",
                 {
                     errorDetails: error.message,
-                    stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+                    stack: config.isDevelopment ? error.stack : undefined,
                 },
                 "IPFS_UPLOAD_ERROR"
             );
@@ -160,24 +158,6 @@ class IPFSService{
         }
     }
     
-    async safeCopyToMfs(cid, fullPath) {
-        try {
-            await ipfsConnection.client.files.cp(`/ipfs/${cid}`, fullPath);
-        } catch (error) {
-            console.error(`Error copiando ${fullPath}:`, error.message);
-            
-            throw KardexError.internal(
-                `No se pudo copiar el archivo a MFS: ${fullPath}`,
-                {
-                    cid,
-                    fullPath,
-                    errorDetails: error.message
-                },
-                "IPFS_COPY_ERROR"
-            );
-        }
-    }
-
     async metadataJSON(metadata) {
         try {
             if (!ipfsConnection.client) {

@@ -1,94 +1,68 @@
-import UseCaseKardexRequest from "../../application/usesCases/kardex/UseCaseKardexRequest.js";
+import UseCaseKardexRequest from "../../application/useCases/kardex/UseCaseKardexRequest.js";
 import KardexError from "../error/kardexErrors.js";
 import StudentService from "../../application/services/StudentService.js";
-import StudentSerror from "../error/studentErrors.js";
+import StudentError from "../error/studentErrors.js";
 import NotificationService from "../../application/services/NotificationService.js";
 
-class PdfController{
-
-    async uploadFile(req,res){
+class PdfController {
+    async uploadFile(req, res, next) {
         try {
-          if (!req.files || req.files.length === 0) {
-            throw new KardexError.fileUploadRequired();
-          }
+            if (!req.files || req.files.length === 0) {
+                throw KardexError.fileUploadRequired();
+            }
 
-          const sisCode = req.body.sisCode;
+            const sisCode = req.body.sisCode;
+            if (!sisCode) throw KardexError.badRequest("El código SIS es requerido");
 
-          if (!sisCode) {
-            throw new KardexError("El código SIS es requerido", 400);
-          }
+            const student = await StudentService.verifyStudentInDB(sisCode);
+            if (!student) {
+                throw StudentError.notFound(
+                    "Código SIS no encontrado",
+                    { sisCode },
+                    "STUDENT_NOT_FOUND"
+                );
+            }
 
-          const student = await StudentService.veryfyStudentInDB(sisCode);
-          if(!student){
-            throw StudentSerror.notFound(
-              "Código SIS no encontrado",
-              { sisCode }, 
-              "STUDENT_NOT_FOUND"
-            );
-          }
+            const studentAskKardex = await NotificationService.studentAskedKardex(sisCode);
+            if (!studentAskKardex) {
+                throw KardexError.badRequest(
+                    "El estudiante no ha solicitado el envío de su kardex.",
+                );
+            }
 
-          const studentAskKardex = await NotificationService.studentsAskKardex(sisCode);
-          if (!studentAskKardex) {
-            throw KardexError.badRequest(
-               "El estudiante no ha solicitado el envío de su kardex.",);
-          }
+            // Normalize array-typed body fields: multer sends a single string
+            // when only one value is uploaded and a real array when multiple.
+            const asArr = (v) => (v == null ? [] : [].concat(v));
+            const careers   = asArr(req.body.careers);
+            const subjects  = asArr(req.body.subject);
+            const notas     = asArr(req.body.notas);
+            const creditos  = asArr(req.body.creditos);
+            const gestiones = asArr(req.body.gestiones);
+            const studentName = req.body.studentName ?? '';
 
-          const files = req.files.map((file, i) => ({
-            blob: file.buffer,
-            filename: file.originalname.normalize('NFD').replace(/[\u0300-\u036f]/g, ""),
-            path: `/${req.body.sisCode}/${req.body.careers[i]}/`, 
-            career: req.body.careers[i],
-            subject: req.body.subject[i],
-            sisCode: sisCode,
-          }));
-          
-          const invalidFiles = files.filter(file => !file.filename.toLowerCase().endsWith('.pdf'));
+            const files = req.files.map((file, i) => ({
+                blob: file.buffer,
+                filename: file.originalname.normalize('NFD').replace(/[̀-ͯ]/g, ""),
+                path: `/${req.body.sisCode}/${careers[i]}/`,
+                career:   careers[i],
+                subject:  subjects[i],
+                nota:     notas[i],
+                creditos: creditos[i],
+                gestion:  gestiones[i],
+                studentName,
+                sisCode,
+            }));
+
+            const invalidFiles = files.filter(file => !file.filename.toLowerCase().endsWith('.pdf'));
             if (invalidFiles.length > 0) {
                 throw KardexError.invalidFileFormat({
-                    invalidFiles: invalidFiles.map(f => f.filename)
+                    invalidFiles: invalidFiles.map(f => f.filename),
                 });
             }
- 
-          const result = await UseCaseKardexRequest.uploadingKardexToIPFS(files);
-          if (result){
-            return res.status(201).json({
-            success: true
-          });
-          }else{
-            return res.status(401).json({
-            success: false
-          });
-          }
-          
-            
-        } catch (error) {
-          console.error('Error en PDF Controller:', error);
-          
-          if (error instanceof StudentSerror) {
-            return res.status(error.statusCode).json({
-                success: false,
-                message: error.message,
-                details: error.details,
-                errorCode: error.errorCode,
-            });
-         }
 
-          if (error instanceof KardexError) {
-            return res.status(error.statusCode).json({
-                success: false,
-                message: error.message,
-                details: error.details,
-                errorCode: error.errorCode,
-            });
-          }
-
-          return res.status(500).json({
-            success: false,
-            message: "Error interno del servidor",
-            details: process.env.NODE_ENV === "development" ? error.message : null,
-            errorCode: "INTERNAL_SERVER_ERROR"
-          });
-        }
+            const result = await UseCaseKardexRequest.uploadingKardexToIPFS(files);
+            return res.status(result ? 201 : 401).json({ success: !!result });
+        } catch (e) { next(e); }
     }
 }
 
