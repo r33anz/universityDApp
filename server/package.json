@@ -4,7 +4,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
     "start": "node src/index.js"
   },
   "keywords": [],
@@ -27,6 +31,9 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "@vitest/coverage-v8": "^1.6.0",
+    "cross-env": "^7.0.3",
+    "supertest": "^7.0.0",
+    "vitest": "^1.6.0"
   }
 }
